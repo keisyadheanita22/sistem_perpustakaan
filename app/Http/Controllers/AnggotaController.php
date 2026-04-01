@@ -9,16 +9,15 @@ use Illuminate\Support\Facades\Hash;
 class AnggotaController extends Controller
 {
     public function index(Request $request)
-    {
-        $anggota = Anggota::when($request->search, function ($query) use ($request) {
-            $query->where('nama', 'like', '%' . $request->search . '%')
-                  ->orWhere('id_anggota', 'like', '%' . $request->search . '%')
-                  ->orWhere('username', 'like', '%' . $request->search . '%');
+{
+    $anggota = \App\Models\User::where('role', 'anggota')
+        ->when($request->search, function ($query) use ($request) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
         })->get();
 
-        return view('petugas.anggota.index', compact('anggota'));
-    }
-
+    return view('petugas.anggota.index', compact('anggota'));
+}
     public function create()
     {
         return view('petugas.anggota.create');

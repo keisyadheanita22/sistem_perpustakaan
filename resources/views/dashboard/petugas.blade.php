@@ -9,7 +9,7 @@
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
     <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
-        <span class="text-white font-bold text-lg italic">Sistem Perpustaakan</span>
+        <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
         <div class="flex items-center gap-2 text-white text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
             <span>{{ Auth::user()->name }}</span>
@@ -23,7 +23,7 @@
             <a href="{{ route('anggota.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Anggota</a>
             <a href="{{ route('peminjaman.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Peminjaman</a>
             <a href="{{ route('kategori.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Kategori</a>
-            <a href="#" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Denda</a>
+            <a href="{{ route('denda.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Denda</a>
             <div class="mt-auto mx-3 pb-4">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -37,7 +37,7 @@
 
         <main class="flex-1 p-8">
             <div class="mb-8">
-                <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+                <h1 class="text-2xl font-bold text-gray-800">Dashboard Petugas</h1>
                 <p class="text-gray-500 text-sm mt-1">Selamat datang, {{ Auth::user()->name }}! 👋</p>
             </div>
 
@@ -77,8 +77,8 @@
                         <a href="{{ route('buku.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm font-medium transition hover:opacity-90" style="background-color:#db2777;">
                             📚 Tambah Buku Baru
                         </a>
-                        <a href="{{ route('anggota.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm font-medium transition hover:opacity-90" style="background-color:#9d174d;">
-                            👤 Tambah Anggota Baru
+                        <a href="{{ route('anggota.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm font-medium transition hover:opacity-90" style="background-color:#9d174d;">
+                            👤 Data Anggota
                         </a>
                         <a href="{{ route('peminjaman.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm font-medium transition hover:opacity-90" style="background-color:#be185d;">
                             📖 Tambah Peminjaman

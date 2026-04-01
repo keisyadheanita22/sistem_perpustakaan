@@ -23,7 +23,7 @@ class DendaController extends Controller
         foreach ($peminjamans as $p) {
             $sudahAda = Denda::where('peminjaman_id', $p->id)->exists();
             if (!$sudahAda) {
-                $hari = Carbon::today()->diffInDays(Carbon::parse($p->tanggal_kembali));
+                $hari = Carbon::parse($p->tanggal_kembali)->diffInDays(Carbon::today());
                 Denda::create([
                     'peminjaman_id'  => $p->id,
                     'nama_anggota'   => $p->nama_anggota,
@@ -74,5 +74,18 @@ class DendaController extends Controller
         Pengaturan::where('kunci', 'denda_per_hari')->update(['nilai' => $request->nilai]);
 
         return redirect()->route('denda.index')->with('success', 'Denda per hari berhasil diupdate!');
+    }
+
+    // -----------------------------------------------
+    // Halaman denda khusus anggota yang login
+    // -----------------------------------------------
+    public function dendaSaya()
+    {
+        $user = auth()->user();
+
+        // Ambil denda milik anggota yang sedang login
+        $dendas = Denda::where('nama_anggota', $user->name)->latest()->get();
+
+        return view('anggota.denda.index', compact('dendas'));
     }
 }

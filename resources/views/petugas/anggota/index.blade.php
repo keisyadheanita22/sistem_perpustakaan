@@ -17,7 +17,7 @@
             <a href="{{ route('petugas.dashboard') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Dashboard</a>
             <a href="{{ route('buku.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Buku</a>
             <a href="{{ route('anggota.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center font-bold" style="background-color:#831843;">Data Anggota</a>
-           <a href="{{ route('peminjaman.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Peminjaman</a>
+            <a href="{{ route('peminjaman.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Peminjaman</a>
             <a href="{{ route('kategori.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Kategori</a>
             <a href="{{ route('denda.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Denda</a>
             <div class="mt-auto mx-3 pb-4">
@@ -40,15 +40,8 @@
                 </div>
             </div>
 
-            @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-sm">
-                {{ session('success') }}
-            </div>
-            @endif
-
             <div class="bg-white rounded-xl shadow p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <a href="{{ route('anggota.create') }}" class="text-white px-4 py-2 rounded text-sm font-medium" style="background-color:#db2777;">+ Tambah Anggota</a>
+                <div class="flex justify-end items-center mb-6">
                     <form method="GET" action="{{ route('anggota.index') }}">
                         <div class="flex items-center border border-gray-300 rounded-lg px-3 py-2 text-sm gap-2 bg-white">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
@@ -66,33 +59,21 @@
                             <th class="px-4 py-3 text-left">Email</th>
                             <th class="px-4 py-3 text-left">No Telepon</th>
                             <th class="px-4 py-3 text-left">Username</th>
-                            <th class="px-4 py-3 text-left">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($anggota as $item)
-                        <tr class="border-b hover:bg-pink-50 transition">
-                            <td class="px-4 py-4">{{ $loop->iteration }}</td>
-                            <td class="px-4 py-4 font-medium">{{ $item->id_anggota }}</td>
-                            <td class="px-4 py-4">{{ $item->nama }}</td>
-                            <td class="px-4 py-4">{{ $item->email }}</td>
-                            <td class="px-4 py-4">{{ $item->no_telepon }}</td>
-                            <td class="px-4 py-4">{{ $item->username }}</td>
-                            <td class="px-4 py-4">
-                                <div class="flex items-center gap-3">
-                                    <a href="{{ route('anggota.edit', $item->id) }}" class="text-yellow-500 hover:text-yellow-600 font-medium text-xs">✏️ Edit</a>
-                                    <span class="text-gray-300">|</span>
-                                    <form action="{{ route('anggota.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin hapus anggota ini?')" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-500 hover:text-red-600 font-medium text-xs">🗑️ Hapus</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
+                       @forelse ($anggota as $item)
+                    <tr class="border-b hover:bg-pink-50 transition">
+                        <td class="px-4 py-4">{{ $loop->iteration }}</td>
+                        <td class="px-4 py-4 font-medium">{{ $item->id_anggota ?? '-' }}</td>
+                        <td class="px-4 py-4">{{ $item->name }}</td>
+                        <td class="px-4 py-4">{{ $item->email }}</td>
+                        <td class="px-4 py-4">{{ $item->no_telepon ?? '-' }}</td>
+                        <td class="px-4 py-4">{{ $item->username ?? '-' }}</td>
+                    </tr>
+                    @empty
                         <tr>
-                            <td colspan="7" class="text-center py-8 text-gray-400">
+                            <td colspan="6" class="text-center py-8 text-gray-400">
                                 <div class="flex flex-col items-center gap-2">
                                     <span class="text-4xl">👤</span>
                                     <span>Tidak ada data anggota.</span>

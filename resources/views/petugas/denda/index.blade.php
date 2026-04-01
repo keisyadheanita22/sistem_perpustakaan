@@ -52,7 +52,16 @@
                     <span class="text-2xl">📌</span>
                     <div>
                         <p class="text-sm font-semibold text-gray-700">Ketentuan Denda</p>
-                        <p class="text-sm text-gray-500">Denda keterlambatan = <span class="font-bold text-pink-600">Rp {{ number_format($dendaPerHari, 0, ',', '.') }} / hari</span></p>
+                      <p class="text-sm text-gray-500">
+    Denda keterlambatan = 
+    <span class="font-bold text-pink-600">
+        Rp {{ number_format($dendaPerHari, 0, ',', '.') }} / hari
+    </span>
+</p>
+
+<p class="text-sm text-red-500 font-medium">
+    Batas keterlambatan maksimal = 7 hari (1 minggu)
+</p>
                     </div>
                 </div>
                 <a href="{{ route('denda.pengaturan') }}" class="text-white px-4 py-2 rounded text-sm font-medium" style="background-color:#db2777;">

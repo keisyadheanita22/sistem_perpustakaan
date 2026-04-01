@@ -28,23 +28,28 @@ class RegisteredUserController extends Controller
             'email'       => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'no_telepon'  => ['required', 'string', 'max:20'],
             'alamat'      => ['required', 'string'],
-            'username'    => ['required', 'string', 'max:50', 'unique:anggotas,username'],
+            'username'    => ['required', 'string', 'max:50', 'unique:users,username'],
             'password'    => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'role'     => 'anggota',
-        ]);
-
-        // Hitung ID anggota otomatis
-        $lastAnggota = Anggota::orderBy('id', 'desc')->first();
-        $newNumber = $lastAnggota ? (int)substr($lastAnggota->id_anggota, 2) + 1 : 1;
+        // Hitung ID anggota otomatis — ambil semua id_anggota lalu cari nomor terbesar
+        $lastUser = User::whereNotNull('id_anggota')
+                        ->orderByRaw('CAST(SUBSTRING(id_anggota, 3) AS UNSIGNED) DESC')
+                        ->first();
+        $newNumber = $lastUser ? (int)substr($lastUser->id_anggota, 2) + 1 : 1;
         $idAnggota = 'AG' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
 
-        // Simpan ke tabel anggotas
+        $user = User::create([
+            'name'        => $request->name,
+            'email'       => $request->email,
+            'password'    => Hash::make($request->password),
+            'role'        => 'anggota',
+            'id_anggota'  => $idAnggota,
+            'no_telepon'  => $request->no_telepon,
+            'username'    => $request->username,
+        ]);
+
+        // Simpan ke tabel anggotas juga
         Anggota::create([
             'id_anggota' => $idAnggota,
             'nama'       => $request->name,
@@ -58,6 +63,6 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+       return redirect(RouteServiceProvider::redirectTo());
     }
 }

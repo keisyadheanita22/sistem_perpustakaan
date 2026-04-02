@@ -73,10 +73,9 @@ class PeminjamanController extends Controller
         'nama_anggota'    => $user->name,
         'buku_id'         => $buku->id,
         'tanggal_pinjam'  => now(),
-        'tanggal_kembali' => now()->addDays(7),
-        'status'          => 'menunggu', // ✅ bukan langsung dipinjam
+        'tanggal_kembali' =>  now()->subDays(3),
+        'status'          => 'menunggu', //  bukan langsung dipinjam
     ]);
-
     // ❌ stok belum dikurangi
 
     return redirect()->route('katalog.index')->with('success', 'Permintaan peminjaman berhasil dikirim, tunggu verifikasi petugas!');

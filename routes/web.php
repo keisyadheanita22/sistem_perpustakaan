@@ -64,10 +64,22 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/denda/pengaturan', [DendaController::class, 'updatePengaturan'])->name('denda.updatePengaturan');
     Route::get('/denda', [DendaController::class, 'index'])->name('denda.index');
     Route::post('/denda/{id}/konfirmasi', [DendaController::class, 'konfirmasi'])->name('denda.konfirmasi');
-});
-Route::get('/cek-role', function () {
+    });
+
+    Route::get('/kepala/katalog', [KepalaController::class, 'katalog'])
+    ->name('kepala.katalog')
+    ->middleware('role:kepala');
+    Route::get('/cek-role', function () {
     return auth()->user()->role;
-});
+    });
+
+    Route::get('/kepala/laporan', [KepalaController::class, 'laporan'])
+    ->name('kepala.laporan')
+    ->middleware('role:kepala');
+
+    Route::get('/kepala/laporan/pdf', [KepalaController::class, 'exportPdf'])->name('kepala.laporan.pdf')->middleware('role:kepala');
+Route::get('/kepala/laporan/excel', [KepalaController::class, 'exportExcel'])->name('kepala.laporan.excel')->middleware('role:kepala');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

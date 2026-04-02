@@ -8,14 +8,11 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR --}}
     <nav class="px-8 h-14 flex items-center" style="background-color:#db2777;">
         <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
     </nav>
 
     <div class="flex flex-1">
-
-        {{-- SIDEBAR --}}
         <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height: calc(100vh - 56px);">
             <a href="{{ route('anggota.dashboard') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Dashboard</a>
             <a href="{{ route('katalog.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Katalog Buku</a>
@@ -33,8 +30,6 @@
         </aside>
 
         <main class="flex-1 p-8">
-
-            {{-- JUDUL --}}
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Peminjaman Saya</h1>
                 <div class="flex items-center gap-2 text-sm text-gray-500">
@@ -43,7 +38,6 @@
                 </div>
             </div>
 
-            {{-- NOTIFIKASI --}}
             @if(session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-sm">
                     {{ session('success') }}
@@ -55,11 +49,10 @@
                 </div>
             @endif
 
-            {{-- TABEL PEMINJAMAN --}}
             <div class="bg-white rounded-xl shadow p-6">
                 <table class="w-full text-sm text-left">
                     <thead>
-                        <tr style="background-color:#db2777;" class="text-white">
+                        <tr class="text-white" style="background-color:#db2777;">
                             <th class="px-4 py-3">No</th>
                             <th class="px-4 py-3">ID Pinjam</th>
                             <th class="px-4 py-3">Buku</th>
@@ -70,7 +63,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- Loop data, @forelse otomatis handle kalau kosong --}}
                         @forelse($peminjamans as $index => $p)
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3">{{ $index + 1 }}</td>
@@ -82,40 +74,36 @@
                             {{-- STATUS BADGE --}}
                             <td class="px-4 py-3">
                                 @if($p->status == 'menunggu')
-                                    <span class="bg-yellow-400 text-white px-3 py-1 rounded-full text-xs">Menunggu</span>
+                                    <span style="background:#f59e0b; color:white; padding:2px 10px; border-radius:999px; font-size:12px;">Menunggu</span>
                                 @elseif($p->status == 'dipinjam')
-                                    <span class="bg-red-500 text-white px-3 py-1 rounded-full text-xs">Dipinjam</span>
+                                    <span style="background:#ef4444; color:white; padding:2px 10px; border-radius:999px; font-size:12px;">Dipinjam</span>
                                 @else
-                                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs">Dikembalikan</span>
+                                    <span style="background:#22c55e; color:white; padding:2px 10px; border-radius:999px; font-size:12px;">Dikembalikan</span>
                                 @endif
                             </td>
 
-                            {{-- TOMBOL AKSI sesuai status --}}
+                            {{-- TOMBOL AKSI --}}
                             <td class="px-4 py-3">
                                 @if($p->status == 'menunggu')
-                                    {{-- Masih menunggu → bisa batalkan --}}
                                     <form method="POST" action="{{ route('peminjaman.batalkan', $p->id) }}">
                                         @csrf
                                         <button type="submit"
-                                            class="bg-gray-400 text-white px-3 py-1 rounded text-xs"
+                                            style="background:#6b7280; color:white; padding:4px 12px; border-radius:6px; font-size:12px;"
                                             onclick="return confirm('Batalkan peminjaman ini?')">
                                             Batalkan
                                         </button>
                                     </form>
                                 @elseif($p->status == 'dipinjam')
-                                    {{-- Sedang dipinjam → bisa kembalikan --}}
                                     <form method="POST" action="{{ route('peminjaman.kembalikan', $p->id) }}">
                                         @csrf
                                         <button type="submit"
-                                            class="text-white px-3 py-1 rounded text-xs"
-                                            style="background-color:#db2777;"
+                                            style="background:#db2777; color:white; padding:4px 12px; border-radius:6px; font-size:12px;"
                                             onclick="return confirm('Kembalikan buku ini?')">
                                             Kembalikan
                                         </button>
                                     </form>
                                 @else
-                                    {{-- Sudah dikembalikan → selesai --}}
-                                    <span class="text-gray-400 text-xs">Selesai</span>
+                                    <span style="color:#9ca3af; font-size:12px;">Selesai</span>
                                 @endif
                             </td>
                         </tr>
@@ -127,7 +115,6 @@
                     </tbody>
                 </table>
             </div>
-
         </main>
     </div>
 

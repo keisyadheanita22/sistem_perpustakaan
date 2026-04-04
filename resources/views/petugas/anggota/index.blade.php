@@ -8,11 +8,14 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
+    {{-- Navbar --}}
     <nav class="px-8 h-14 flex items-center" style="background-color:#db2777;">
         <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
     </nav>
 
     <div class="flex flex-1">
+
+        {{-- Sidebar --}}
         <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height: calc(100vh - 56px);">
             <a href="{{ route('petugas.dashboard') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Dashboard</a>
             <a href="{{ route('buku.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Buku</a>
@@ -31,6 +34,7 @@
             </div>
         </aside>
 
+        {{-- Konten Utama --}}
         <main class="flex-1 p-8">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Data Anggota</h1>
@@ -40,7 +44,16 @@
                 </div>
             </div>
 
+            {{-- Notifikasi sukses --}}
+            @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-sm">
+                {{ session('success') }}
+            </div>
+            @endif
+
             <div class="bg-white rounded-xl shadow p-6">
+
+                {{-- Form Pencarian --}}
                 <div class="flex justify-end items-center mb-6">
                     <form method="GET" action="{{ route('anggota.index') }}">
                         <div class="flex items-center border border-gray-300 rounded-lg px-3 py-2 text-sm gap-2 bg-white">
@@ -50,6 +63,7 @@
                     </form>
                 </div>
 
+                {{-- Tabel Data Anggota --}}
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="text-white" style="background-color:#db2777;">
@@ -59,21 +73,35 @@
                             <th class="px-4 py-3 text-left">Email</th>
                             <th class="px-4 py-3 text-left">No Telepon</th>
                             <th class="px-4 py-3 text-left">Username</th>
+                            <th class="px-4 py-3 text-left">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                       @forelse ($anggota as $item)
-                    <tr class="border-b hover:bg-pink-50 transition">
-                        <td class="px-4 py-4">{{ $loop->iteration }}</td>
-                        <td class="px-4 py-4 font-medium">{{ $item->id_anggota ?? '-' }}</td>
-                        <td class="px-4 py-4">{{ $item->name }}</td>
-                        <td class="px-4 py-4">{{ $item->email }}</td>
-                        <td class="px-4 py-4">{{ $item->no_telepon ?? '-' }}</td>
-                        <td class="px-4 py-4">{{ $item->username ?? '-' }}</td>
-                    </tr>
-                    @empty
+                        @forelse ($anggota as $item)
+                        <tr class="border-b hover:bg-pink-50 transition">
+                            <td class="px-4 py-4">{{ $loop->iteration }}</td>
+                            <td class="px-4 py-4 font-medium">{{ $item->id_anggota ?? '-' }}</td>
+                            <td class="px-4 py-4">{{ $item->name }}</td>
+                            <td class="px-4 py-4">{{ $item->email }}</td>
+                            <td class="px-4 py-4">{{ $item->no_telepon ?? '-' }}</td>
+                            <td class="px-4 py-4">{{ $item->username ?? '-' }}</td>
+
+                            {{-- Tombol Hapus --}}
+                            <td class="px-4 py-4">
+                                <form action="{{ route('anggota.destroy', $item->id) }}" method="POST"
+                                    onsubmit="return confirm('Yakin hapus anggota {{ $item->name }}?')" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-500 hover:text-red-600 font-medium text-xs">
+                                        🗑️ Hapus
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        {{-- Tampilan jika tidak ada data --}}
                         <tr>
-                            <td colspan="6" class="text-center py-8 text-gray-400">
+                            <td colspan="7" class="text-center py-8 text-gray-400">
                                 <div class="flex flex-col items-center gap-2">
                                     <span class="text-4xl">👤</span>
                                     <span>Tidak ada data anggota.</span>

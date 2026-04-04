@@ -8,16 +8,38 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <nav class="px-8 h-14 flex items-center" style="background-color:#db2777;">
+    {{-- NAVBAR: Menampilkan nama sistem dan inisial user yang bisa diklik ke halaman profil --}}
+    <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
         <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
+
+        {{-- Inisial huruf pertama nama user dalam lingkaran, klik untuk ke halaman profil --}}
+        <a href="{{ route('anggota.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                style="background-color:#9d174d;">
+                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+            </div>
+            <span>{{ Auth::user()->name }}</span>
+        </a>
     </nav>
 
     <div class="flex flex-1">
+
+        {{-- SIDEBAR: Menu navigasi utama untuk anggota --}}
         <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height: calc(100vh - 56px);">
+
+            {{-- Menu Dashboard --}}
             <a href="{{ route('anggota.dashboard') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Dashboard</a>
+
+            {{-- Menu Katalog Buku (aktif/highlight) --}}
             <a href="{{ route('katalog.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center font-bold" style="background-color:#831843;">Katalog Buku</a>
+
+            {{-- Menu Peminjaman Saya --}}
             <a href="{{ route('peminjaman.saya') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Peminjaman Saya</a>
+
+            {{-- Menu Denda Saya --}}
             <a href="{{ route('denda.saya') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Denda Saya</a>
+
+            {{-- Tombol Logout di bagian bawah sidebar --}}
             <div class="mt-auto mx-3 pb-4">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -30,22 +52,24 @@
         </aside>
 
         <main class="flex-1 p-8">
+
+            {{-- JUDUL HALAMAN --}}
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Katalog Buku</h1>
-                <div class="flex items-center gap-2 text-sm text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    {{ auth()->user()->name }}
-                </div>
             </div>
 
+            {{-- NOTIFIKASI SUKSES: Muncul setelah berhasil pinjam buku --}}
             @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-sm">
                 {{ session('success') }}
             </div>
             @endif
 
+            {{-- FILTER & PENCARIAN: Filter berdasarkan kategori dan cari buku --}}
             <div class="flex justify-end items-center mb-6">
                 <form method="GET" action="{{ route('katalog.index') }}" class="flex items-center gap-2">
+
+                    {{-- Dropdown filter kategori, submit otomatis saat dipilih --}}
                     <select name="kategori_id" onchange="this.form.submit()"
                         class="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none bg-white">
                         <option value="">Semua Kategori</option>
@@ -55,6 +79,8 @@
                             </option>
                         @endforeach
                     </select>
+
+                    {{-- Input pencarian buku berdasarkan judul/pengarang --}}
                     <div class="flex items-center border border-gray-300 rounded-lg px-3 py-2 text-sm gap-2 bg-white">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Buku..." class="outline-none text-sm w-48">
@@ -62,53 +88,62 @@
                 </form>
             </div>
 
+            {{-- DAFTAR BUKU --}}
             @if($bukus->isEmpty())
+            {{-- Tampilan jika tidak ada buku --}}
             <div class="flex flex-col items-center justify-center py-16 text-gray-400">
                 <span class="text-5xl mb-3">📚</span>
                 <span>Tidak ada data buku.</span>
             </div>
             @else
-          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
-    @foreach ($bukus as $buku)
-    <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-md transition flex flex-col">
-        @if($buku->foto)
-            <img src="{{ asset('storage/' . $buku->foto) }}" alt="{{ $buku->judul }}"
-                class="w-full object-cover" style="height:220px;">
-        @else
-            <div class="w-full flex flex-col items-center justify-center" style="height:220px; background: linear-gradient(135deg, #fce7f3, #fbcfe8);">
-                <span style="font-size:36px;">📚</span>
-                <span class="text-xs font-medium mt-1 px-2 text-center" style="color:#9d174d;">{{ Str::limit($buku->judul, 20) }}</span>
+            {{-- Grid kartu buku --}}
+            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+                @foreach ($bukus as $buku)
+                <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-md transition flex flex-col">
+
+                    {{-- Foto buku atau placeholder jika tidak ada foto --}}
+                    @if($buku->foto)
+                        <img src="{{ asset('storage/' . $buku->foto) }}" alt="{{ $buku->judul }}"
+                            class="w-full object-cover" style="height:220px;">
+                    @else
+                        <div class="w-full flex flex-col items-center justify-center" style="height:220px; background: linear-gradient(135deg, #fce7f3, #fbcfe8);">
+                            <span style="font-size:36px;">📚</span>
+                            <span class="text-xs font-medium mt-1 px-2 text-center" style="color:#9d174d;">{{ Str::limit($buku->judul, 20) }}</span>
+                        </div>
+                    @endif
+
+                    <div class="p-4 flex flex-col justify-between flex-1">
+                        {{-- Judul dan pengarang buku --}}
+                        <p class="font-semibold text-gray-800 text-base truncate">{{ $buku->judul }}</p>
+                        <p class="text-sm text-gray-500 mb-2 truncate">{{ $buku->pengarang }}</p>
+
+                        {{-- Badge kategori buku --}}
+                        @if($buku->kategori)
+                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium mb-2" style="background:#fce7f3; color:#9d174d;">
+                            {{ $buku->kategori->nama_kategori }}
+                        </span>
+                        @endif
+
+                        {{-- Info stok buku --}}
+                        <p class="text-sm text-gray-400 mb-3">Stok: {{ $buku->stok }}</p>
+
+                        {{-- Tombol pinjam jika stok tersedia, atau tombol nonaktif jika habis --}}
+                        @if($buku->stok > 0)
+                        <form action="{{ route('peminjaman.pinjam', $buku->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full text-base py-3 rounded-lg font-bold text-white" style="background-color:#db2777;">
+                                📖 Pinjam
+                            </button>
+                        </form>
+                        @else
+                        <button disabled class="w-full text-base py-3 rounded-lg font-bold" style="background:#f3f4f6; color:#9ca3af;">
+                            Stok Habis
+                        </button>
+                        @endif
+                    </div>
+                </div>
+                @endforeach
             </div>
-        @endif
-
-        <div class="p-4 flex flex-col justify-between flex-1">
-            <p class="font-semibold text-gray-800 text-base truncate">{{ $buku->judul }}</p>
-            <p class="text-sm text-gray-500 mb-2 truncate">{{ $buku->pengarang }}</p>
-
-            @if($buku->kategori)
-            <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium mb-2" style="background:#fce7f3; color:#9d174d;">
-                {{ $buku->kategori->nama_kategori }}
-            </span>
-            @endif
-
-            <p class="text-sm text-gray-400 mb-3">Stok: {{ $buku->stok }}</p>
-
-            @if($buku->stok > 0)
-            <form action="{{ route('peminjaman.pinjam', $buku->id) }}" method="POST">
-                @csrf
-                <button type="submit" class="w-full text-base py-3 rounded-lg font-bold text-white" style="background-color:#db2777;">
-                    📖 Pinjam
-                </button>
-            </form>
-            @else
-            <button disabled class="w-full text-base py-3 rounded-lg font-bold" style="background:#f3f4f6; color:#9ca3af;">
-                Stok Habis
-            </button>
-            @endif
-        </div>
-    </div>
-    @endforeach
-</div>
             @endif
         </main>
     </div>

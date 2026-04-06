@@ -8,18 +8,44 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <nav class="px-8 h-14 flex items-center" style="background-color:#db2777;">
-        <span class="text-white font-bold text-lg italic">Perpustakaan Digital</span>
+    {{-- NAVBAR: Menampilkan nama sistem dan inisial user --}}
+    <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
+        <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
+
+        {{-- Inisial huruf pertama nama petugas dalam lingkaran --}}
+        <div class="flex items-center gap-2 text-white text-sm">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                style="background-color:#9d174d;">
+                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+            </div>
+            <span>{{ Auth::user()->name }}</span>
+        </div>
     </nav>
 
     <div class="flex flex-1">
+
+        {{-- SIDEBAR: Menu navigasi utama untuk petugas --}}
         <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height: calc(100vh - 56px);">
+
+            {{-- Menu Dashboard --}}
             <a href="{{ route('petugas.dashboard') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Dashboard</a>
+
+            {{-- Menu Data Buku --}}
             <a href="{{ route('buku.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Buku</a>
+
+            {{-- Menu Data Anggota --}}
             <a href="{{ route('anggota.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Anggota</a>
-            <a href="#" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Peminjaman</a>
+
+            {{-- Menu Peminjaman --}}
+            <a href="{{ route('peminjaman.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Peminjaman</a>
+
+            {{-- Menu Kategori (aktif/highlight) --}}
             <a href="{{ route('kategori.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center font-bold" style="background-color:#831843;">Kategori</a>
-            <a href="#" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Denda</a>
+
+            {{-- Menu Denda --}}
+            <a href="{{ route('denda.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Denda</a>
+
+            {{-- Tombol Logout di bagian bawah sidebar --}}
             <div class="mt-auto mx-3 pb-4">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -32,23 +58,31 @@
         </aside>
 
         <main class="flex-1 p-8">
+
+            {{-- JUDUL HALAMAN --}}
             <h1 class="text-2xl font-bold text-gray-800 mb-6">Edit Kategori</h1>
 
             <div class="bg-white rounded-xl shadow p-6 max-w-md">
+
+                {{-- FORM EDIT KATEGORI: Kirim data ke KategoriController@update --}}
                 <form method="POST" action="{{ route('kategori.update', $kategori->id) }}">
                     @csrf
                     @method('PUT')
 
+                    {{-- Input nama kategori, diisi dengan data yang sudah ada --}}
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kategori</label>
                         <input type="text" name="nama_kategori" value="{{ old('nama_kategori', $kategori->nama_kategori) }}"
                             class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
                             placeholder="Masukkan nama kategori"/>
+
+                        {{-- Pesan error validasi --}}
                         @error('nama_kategori')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
+                    {{-- Tombol update dan batal --}}
                     <div class="flex gap-3 mt-6">
                         <button type="submit" class="px-6 py-2 rounded text-white text-sm font-medium" style="background-color:#16a34a;">Update</button>
                         <a href="{{ route('kategori.index') }}" class="px-6 py-2 rounded text-white text-sm font-medium" style="background-color:#dc2626;">Batal</a>

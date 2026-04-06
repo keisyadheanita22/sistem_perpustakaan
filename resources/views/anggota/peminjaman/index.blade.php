@@ -80,7 +80,7 @@
                             <th class="px-4 py-3">No</th>
                             <th class="px-4 py-3">ID Pinjam</th>
                             <th class="px-4 py-3">Buku</th>
-                            <th class="px-4 py-3">Tgl Pinjam</th>
+                            <th class="px-4 py-3">Tanggal Pinjam</th>
                             <th class="px-4 py-3">Batas Kembali</th>
                             <th class="px-4 py-3">Status</th>
                             <th class="px-4 py-3">Aksi</th>

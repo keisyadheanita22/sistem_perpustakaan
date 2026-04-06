@@ -8,21 +8,44 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- Navbar --}}
-    <nav class="px-8 h-14 flex items-center" style="background-color:#db2777;">
+    {{-- NAVBAR: Menampilkan nama sistem dan inisial user --}}
+    <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
         <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
+
+        {{-- Inisial huruf pertama nama petugas dalam lingkaran --}}
+        <div class="flex items-center gap-2 text-white text-sm">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                style="background-color:#9d174d;">
+                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+            </div>
+            <span>{{ Auth::user()->name }}</span>
+        </div>
     </nav>
 
     <div class="flex flex-1">
 
-        {{-- Sidebar --}}
+        {{-- SIDEBAR: Menu navigasi utama untuk petugas --}}
         <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height: calc(100vh - 56px);">
+
+            {{-- Menu Dashboard --}}
             <a href="{{ route('petugas.dashboard') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Dashboard</a>
+
+            {{-- Menu Data Buku --}}
             <a href="{{ route('buku.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Buku</a>
+
+            {{-- Menu Data Anggota (aktif/highlight) --}}
             <a href="{{ route('anggota.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center font-bold" style="background-color:#831843;">Data Anggota</a>
+
+            {{-- Menu Peminjaman --}}
             <a href="{{ route('peminjaman.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Peminjaman</a>
+
+            {{-- Menu Kategori --}}
             <a href="{{ route('kategori.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Kategori</a>
+
+            {{-- Menu Denda --}}
             <a href="{{ route('denda.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Denda</a>
+
+            {{-- Tombol Logout di bagian bawah sidebar --}}
             <div class="mt-auto mx-3 pb-4">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -34,17 +57,15 @@
             </div>
         </aside>
 
-        {{-- Konten Utama --}}
+        {{-- KONTEN UTAMA --}}
         <main class="flex-1 p-8">
+
+            {{-- JUDUL HALAMAN --}}
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Data Anggota</h1>
-                <div class="flex items-center gap-2 text-sm text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    Petugas
-                </div>
             </div>
 
-            {{-- Notifikasi sukses --}}
+            {{-- NOTIFIKASI SUKSES: Muncul setelah berhasil hapus anggota --}}
             @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-sm">
                 {{ session('success') }}
@@ -53,7 +74,7 @@
 
             <div class="bg-white rounded-xl shadow p-6">
 
-                {{-- Form Pencarian --}}
+                {{-- FORM PENCARIAN: Cari anggota berdasarkan nama atau email --}}
                 <div class="flex justify-end items-center mb-6">
                     <form method="GET" action="{{ route('anggota.index') }}">
                         <div class="flex items-center border border-gray-300 rounded-lg px-3 py-2 text-sm gap-2 bg-white">
@@ -63,7 +84,7 @@
                     </form>
                 </div>
 
-                {{-- Tabel Data Anggota --}}
+                {{-- TABEL DATA ANGGOTA: Menampilkan daftar anggota yang sudah registrasi --}}
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="text-white" style="background-color:#db2777;">
@@ -80,13 +101,23 @@
                         @forelse ($anggota as $item)
                         <tr class="border-b hover:bg-pink-50 transition">
                             <td class="px-4 py-4">{{ $loop->iteration }}</td>
+
+                            {{-- ID anggota otomatis (AG001, AG002, dst) --}}
                             <td class="px-4 py-4 font-medium">{{ $item->id_anggota ?? '-' }}</td>
+
+                            {{-- Nama lengkap anggota --}}
                             <td class="px-4 py-4">{{ $item->name }}</td>
+
+                            {{-- Email anggota --}}
                             <td class="px-4 py-4">{{ $item->email }}</td>
+
+                            {{-- No telepon anggota --}}
                             <td class="px-4 py-4">{{ $item->no_telepon ?? '-' }}</td>
+
+                            {{-- Username anggota --}}
                             <td class="px-4 py-4">{{ $item->username ?? '-' }}</td>
 
-                            {{-- Tombol Hapus --}}
+                            {{-- Tombol hapus anggota dengan konfirmasi --}}
                             <td class="px-4 py-4">
                                 <form action="{{ route('anggota.destroy', $item->id) }}" method="POST"
                                     onsubmit="return confirm('Yakin hapus anggota {{ $item->name }}?')" class="inline">
@@ -99,7 +130,7 @@
                             </td>
                         </tr>
                         @empty
-                        {{-- Tampilan jika tidak ada data --}}
+                        {{-- Tampilan jika tidak ada data anggota --}}
                         <tr>
                             <td colspan="7" class="text-center py-8 text-gray-400">
                                 <div class="flex flex-col items-center gap-2">

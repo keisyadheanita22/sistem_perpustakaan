@@ -8,16 +8,20 @@ use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\DendaController;
 use App\Http\Controllers\Anggota\KatalogController;
 use App\Http\Controllers\Anggota\ProfilAnggotaController;
+use App\Http\Controllers\Petugas\ProfilPetugasController;
 use App\Http\Controllers\KepalaController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 
+// =====================
 // Halaman utama / landing page
+// =====================
 Route::get('/', function () {
     return view('welcome');
 });
 
+// =====================
 // Semua route yang butuh login
+// =====================
 Route::middleware(['auth'])->group(function () {
 
     // =====================
@@ -36,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('role:kepala');
 
     // =====================
-    // Route Buku - petugas
+    // Route Buku - petugas (CRUD lengkap)
     // =====================
     Route::resource('buku', BukuController::class);
 
@@ -52,17 +56,30 @@ Route::middleware(['auth'])->group(function () {
     // Tampilkan halaman profil anggota
     Route::get('/profil', [ProfilAnggotaController::class, 'show'])->name('anggota.profil');
 
-    // Update data profil (nama, email, no telepon, username)
+    // Update data profil anggota (nama, email, no telepon, username)
     Route::put('/profil/update', [ProfilAnggotaController::class, 'update'])->name('anggota.profil.update');
 
     // Ganti password anggota
     Route::put('/profil/password', [ProfilAnggotaController::class, 'gantiPassword'])->name('anggota.profil.password');
 
     // =====================
-    // Route Peminjaman - anggota
+    // Route Profil - petugas
     // =====================
 
-    // Lihat daftar peminjaman milik anggota sendiri (harus sebelum resource!)
+    // Tampilkan halaman profil petugas
+    Route::get('/petugas/profil', [ProfilPetugasController::class, 'show'])->name('petugas.profil');
+
+    // Update data profil petugas (nama, email)
+    Route::put('/petugas/profil/update', [ProfilPetugasController::class, 'update'])->name('petugas.profil.update');
+
+    // Ganti password petugas
+    Route::put('/petugas/profil/password', [ProfilPetugasController::class, 'gantiPassword'])->name('petugas.profil.password');
+
+    // =====================
+    // Route Peminjaman - anggota (harus sebelum resource!)
+    // =====================
+
+    // Lihat daftar peminjaman milik anggota sendiri
     Route::get('/peminjaman/saya', [PeminjamanController::class, 'peminjamanSaya'])->name('peminjaman.saya');
 
     // Anggota pinjam buku dari katalog
@@ -97,11 +114,19 @@ Route::middleware(['auth'])->group(function () {
     // =====================
     // Route Anggota - hanya petugas (lihat daftar & hapus)
     // =====================
-    Route::get('/anggota', [AnggotaController::class, 'index'])->middleware('role:petugas')->name('anggota.index');
-    Route::delete('/anggota/{id}', [AnggotaController::class, 'destroy'])->middleware('role:petugas')->name('anggota.destroy');
+
+    // Lihat daftar anggota yang sudah registrasi
+    Route::get('/anggota', [AnggotaController::class, 'index'])
+        ->middleware('role:petugas')
+        ->name('anggota.index');
+
+    // Hapus anggota
+    Route::delete('/anggota/{id}', [AnggotaController::class, 'destroy'])
+        ->middleware('role:petugas')
+        ->name('anggota.destroy');
 
     // =====================
-    // Route Kategori - petugas
+    // Route Kategori - petugas (CRUD lengkap)
     // =====================
     Route::resource('kategori', KategoriController::class);
 
@@ -113,39 +138,54 @@ Route::middleware(['auth'])->group(function () {
     // =====================
     // Route Denda
     // =====================
+
+    // Anggota lihat denda miliknya sendiri
     Route::get('/denda/saya', [DendaController::class, 'dendaSaya'])->name('denda.saya');
+
+    // Petugas lihat & ubah pengaturan denda per hari
     Route::get('/denda/pengaturan', [DendaController::class, 'pengaturan'])->name('denda.pengaturan');
     Route::post('/denda/pengaturan', [DendaController::class, 'updatePengaturan'])->name('denda.updatePengaturan');
+
+    // Petugas lihat semua denda
     Route::get('/denda', [DendaController::class, 'index'])->name('denda.index');
+
+    // Petugas konfirmasi pembayaran denda
     Route::post('/denda/{id}/konfirmasi', [DendaController::class, 'konfirmasi'])->name('denda.konfirmasi');
 });
 
 // =====================
 // Route Kepala Perpustakaan
 // =====================
+
+// Dashboard kepala
+Route::get('/dashboard/kepala', [KepalaController::class, 'dashboard'])
+    ->name('kepala.dashboard')
+    ->middleware(['auth', 'role:kepala']);
+
+// Katalog buku untuk kepala
 Route::get('/kepala/katalog', [KepalaController::class, 'katalog'])
     ->name('kepala.katalog')
-    ->middleware('role:kepala');
+    ->middleware(['auth', 'role:kepala']);
 
-// Cek role user yang sedang login (untuk debugging)
-Route::get('/cek-role', function () {
-    return auth()->user()->role;
-});
-
-// Laporan kepala
+// Laporan perpustakaan
 Route::get('/kepala/laporan', [KepalaController::class, 'laporan'])
     ->name('kepala.laporan')
-    ->middleware('role:kepala');
+    ->middleware(['auth', 'role:kepala']);
 
 // Export laporan ke PDF
 Route::get('/kepala/laporan/pdf', [KepalaController::class, 'exportPdf'])
     ->name('kepala.laporan.pdf')
-    ->middleware('role:kepala');
+    ->middleware(['auth', 'role:kepala']);
 
 // Export laporan ke Excel
 Route::get('/kepala/laporan/excel', [KepalaController::class, 'exportExcel'])
     ->name('kepala.laporan.excel')
-    ->middleware('role:kepala');
+    ->middleware(['auth', 'role:kepala']);
+
+// Cek role user yang sedang login (untuk debugging)
+Route::get('/cek-role', function () {
+    return auth()->user()->role;
+})->middleware('auth');
 
 // =====================
 // Route Profile (bawaan Laravel)

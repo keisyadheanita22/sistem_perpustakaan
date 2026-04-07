@@ -8,9 +8,19 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <nav class="px-8 h-14 flex items-center" style="background-color:#db2777;">
-        <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
-    </nav>
+<nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
+    <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
+    <a href="{{ route('petugas.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
+        @if(Auth::user()->foto)
+            <img src="{{ asset('storage/' . Auth::user()->foto) }}" class="w-8 h-8 rounded-full object-cover">
+        @else
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style="background-color:#9d174d;">
+                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+            </div>
+        @endif
+        <span>{{ Auth::user()->name }}</span>
+    </a>
+</nav>
 
     <div class="flex flex-1">
         <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height: calc(100vh - 56px);">
@@ -34,20 +44,14 @@
         <main class="flex-1 p-8">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Peminjaman</h1>
-                <div class="flex items-center gap-2 text-sm text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    Petugas
-                </div>
             </div>
 
-            {{-- Notifikasi sukses --}}
             @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-sm">
                 {{ session('success') }}
             </div>
             @endif
 
-            {{-- Notifikasi error --}}
             @if(session('error'))
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
                 {{ session('error') }}
@@ -56,7 +60,6 @@
 
             <div class="bg-white rounded-xl shadow p-6">
                 <div class="flex justify-between items-center mb-6">
-                    {{-- Form pencarian anggota --}}
                     <form method="GET" action="{{ route('peminjaman.index') }}">
                         <div class="flex items-center border border-gray-300 rounded-lg px-3 py-2 text-sm gap-2 bg-white">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
@@ -72,7 +75,7 @@
                             <th class="px-4 py-3 text-left">ID Pinjam</th>
                             <th class="px-4 py-3 text-left">Anggota</th>
                             <th class="px-4 py-3 text-left">Buku</th>
-                            <th class="px-4 py-3 text-left">Tgl Pinjam</th>
+                            <th class="px-4 py-3 text-left">Tanggal Pinjam</th>
                             <th class="px-4 py-3 text-left">Batas Kembali</th>
                             <th class="px-4 py-3 text-left">Status</th>
                             <th class="px-4 py-3 text-left">Aksi</th>
@@ -87,56 +90,38 @@
                             <td class="px-4 py-4">{{ $item->buku->judul ?? '-' }}</td>
                             <td class="px-4 py-4">{{ $item->tanggal_pinjam }}</td>
                             <td class="px-4 py-4">{{ $item->tanggal_kembali }}</td>
-
-                            {{-- Badge status dengan 4 warna --}}
                             <td class="px-4 py-4">
-                                <span class="px-2 py-1 rounded-full text-xs font-medium text-white"
-                                    style="background-color:
-                                        {{ $item->status == 'menunggu'      ? '#d97706' :   // Kuning: menunggu verifikasi pinjam
-                                           ($item->status == 'dipinjam'     ? '#dc2626' :   // Merah: sedang dipinjam
-                                           ($item->status == 'mengembalikan'? '#7c3aed' :   // Ungu: anggota minta kembali
-                                           '#16a34a')) }}">                                  {{-- Hijau: sudah dikembalikan --}}
-                                    {{ $item->status == 'mengembalikan' ? 'Minta Kembali' : ucfirst($item->status) }}
-                                </span>
+                                @if($item->status == 'menunggu')
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#d97706;">Menunggu</span>
+                                @elseif($item->status == 'dipinjam')
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#dc2626;">Dipinjam</span>
+                                @elseif($item->status == 'mengembalikan')
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#7c3aed;">Minta Kembali</span>
+                                @else
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#16a34a;">Dikembalikan</span>
+                                @endif
                             </td>
-
-                            {{-- Tombol aksi --}}
                             <td class="px-4 py-4">
                                 <div class="flex items-center gap-3 flex-wrap">
-
-                                    {{-- Tombol verifikasi peminjaman baru (status: menunggu) --}}
                                     @if($item->status == 'menunggu')
-                                    <form action="{{ route('peminjaman.verifikasi', $item->id) }}" method="POST"
-                                        onsubmit="return confirm('Verifikasi peminjaman ini?')" class="inline">
+                                    <form action="{{ route('peminjaman.verifikasi', $item->id) }}" method="POST" onsubmit="return confirm('Verifikasi peminjaman ini?')" class="inline">
                                         @csrf
-                                        <button type="submit" class="text-green-500 hover:text-green-600 font-medium text-xs">
-                                            ✅ Verifikasi Pinjam
-                                        </button>
+                                        <button type="submit" class="text-green-500 hover:text-green-600 font-medium text-xs">✅ Verifikasi Pinjam</button>
                                     </form>
                                     <span class="text-gray-300">|</span>
                                     @endif
 
-                                    {{-- Tombol verifikasi pengembalian (status: mengembalikan) --}}
-                                    {{-- Muncul saat anggota sudah klik tombol "Kembalikan" --}}
                                     @if($item->status == 'mengembalikan')
-                                    <form action="{{ route('peminjaman.verifikasiKembali', $item->id) }}" method="POST"
-                                        onsubmit="return confirm('Verifikasi pengembalian buku ini? Stok akan bertambah.')" class="inline">
+                                    <form action="{{ route('peminjaman.verifikasiKembali', $item->id) }}" method="POST" onsubmit="return confirm('Verifikasi pengembalian buku ini? Stok akan bertambah.')" class="inline">
                                         @csrf
-                                        <button type="submit" class="text-blue-500 hover:text-blue-600 font-medium text-xs">
-                                            ↩️ Verifikasi Kembali
-                                        </button>
+                                        <button type="submit" class="text-blue-500 hover:text-blue-600 font-medium text-xs">↩️ Verifikasi Kembali</button>
                                     </form>
                                     <span class="text-gray-300">|</span>
                                     @endif
 
-                                    {{-- Tombol edit --}}
-                                    <a href="{{ route('peminjaman.edit', $item->id) }}"
-                                        class="text-yellow-500 hover:text-yellow-600 font-medium text-xs">✏️ Edit</a>
+                                    <a href="{{ route('peminjaman.edit', $item->id) }}" class="text-yellow-500 hover:text-yellow-600 font-medium text-xs">✏️ Edit</a>
                                     <span class="text-gray-300">|</span>
-
-                                    {{-- Tombol hapus --}}
-                                    <form action="{{ route('peminjaman.destroy', $item->id) }}" method="POST"
-                                        onsubmit="return confirm('Yakin hapus peminjaman ini?')" class="inline">
+                                    <form action="{{ route('peminjaman.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin hapus peminjaman ini?')" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-500 hover:text-red-600 font-medium text-xs">🗑️ Hapus</button>

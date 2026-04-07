@@ -8,18 +8,18 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR: Menampilkan nama sistem dan inisial user --}}
+   {{-- NAVBAR: Menampilkan nama sistem dan inisial user --}}
     <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
         <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
 
-        {{-- Inisial huruf pertama nama petugas dalam lingkaran --}}
-        <div class="flex items-center gap-2 text-white text-sm">
+        {{-- Inisial huruf pertama nama petugas dalam lingkaran, klik untuk ke halaman profil --}}
+        <a href="{{ route('petugas.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
             <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
                 style="background-color:#9d174d;">
                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
             </div>
             <span>{{ Auth::user()->name }}</span>
-        </div>
+        </a>
     </nav>
 
     <div class="flex flex-1">

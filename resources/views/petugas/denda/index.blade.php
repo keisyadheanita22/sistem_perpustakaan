@@ -8,44 +8,28 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR: Menampilkan nama sistem dan inisial user --}}
-    <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
-        <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
-
-        {{-- Inisial huruf pertama nama petugas dalam lingkaran --}}
-        <div class="flex items-center gap-2 text-white text-sm">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
-                style="background-color:#9d174d;">
+<nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
+    <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
+    <a href="{{ route('petugas.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
+        @if(Auth::user()->foto)
+            <img src="{{ asset('storage/' . Auth::user()->foto) }}" class="w-8 h-8 rounded-full object-cover">
+        @else
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style="background-color:#9d174d;">
                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
             </div>
-            <span>{{ Auth::user()->name }}</span>
-        </div>
-    </nav>
+        @endif
+        <span>{{ Auth::user()->name }}</span>
+    </a>
+</nav>
 
     <div class="flex flex-1">
-
-        {{-- SIDEBAR: Menu navigasi utama untuk petugas --}}
         <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height: calc(100vh - 56px);">
-
-            {{-- Menu Dashboard --}}
             <a href="{{ route('petugas.dashboard') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Dashboard</a>
-
-            {{-- Menu Data Buku --}}
             <a href="{{ route('buku.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Buku</a>
-
-            {{-- Menu Data Anggota --}}
             <a href="{{ route('anggota.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Anggota</a>
-
-            {{-- Menu Peminjaman --}}
             <a href="{{ route('peminjaman.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Peminjaman</a>
-
-            {{-- Menu Kategori --}}
             <a href="{{ route('kategori.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Kategori</a>
-
-            {{-- Menu Denda (aktif/highlight) --}}
             <a href="{{ route('denda.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center font-bold" style="background-color:#831843;">Denda</a>
-
-            {{-- Tombol Logout di bagian bawah sidebar --}}
             <div class="mt-auto mx-3 pb-4">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -58,48 +42,31 @@
         </aside>
 
         <main class="flex-1 p-8">
-
-            {{-- JUDUL HALAMAN --}}
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Denda</h1>
             </div>
 
-            {{-- NOTIFIKASI SUKSES: Muncul setelah konfirmasi pembayaran denda --}}
             @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-sm">
                 {{ session('success') }}
             </div>
             @endif
 
-            {{-- INFO KETENTUAN DENDA: Menampilkan besaran denda per hari dan link ubah denda --}}
             <div class="bg-white rounded-xl shadow p-4 mb-6 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl">📌</span>
                     <div>
                         <p class="text-sm font-semibold text-gray-700">Ketentuan Denda</p>
-
-                        {{-- Besaran denda per hari dari pengaturan --}}
                         <p class="text-sm text-gray-500">
                             Denda keterlambatan =
-                            <span class="font-bold text-pink-600">
-                                Rp {{ number_format($dendaPerHari, 0, ',', '.') }} / hari
-                            </span>
+                            <span class="font-bold text-pink-600">Rp {{ number_format($dendaPerHari, 0, ',', '.') }} / hari</span>
                         </p>
-
-                        {{-- Batas maksimal keterlambatan --}}
-                        <p class="text-sm text-red-500 font-medium">
-                            Batas keterlambatan maksimal = 7 hari (1 minggu)
-                        </p>
+                        <p class="text-sm text-red-500 font-medium">Batas keterlambatan maksimal = 7 hari (1 minggu)</p>
                     </div>
                 </div>
-
-                {{-- Tombol ubah pengaturan denda --}}
-                <a href="{{ route('denda.pengaturan') }}" class="text-white px-4 py-2 rounded text-sm font-medium" style="background-color:#db2777;">
-                    ⚙️ Ubah Denda
-                </a>
+                <a href="{{ route('denda.pengaturan') }}" class="text-white px-4 py-2 rounded text-sm font-medium" style="background-color:#db2777;">⚙️ Ubah Denda</a>
             </div>
 
-            {{-- TABEL DENDA: Menampilkan semua denda anggota --}}
             <table class="w-full text-sm">
                 <thead>
                     <tr class="text-white" style="background-color:#db2777;">
@@ -117,27 +84,15 @@
                     @forelse ($dendas as $item)
                     <tr class="border-b hover:bg-pink-50 transition">
                         <td class="px-4 py-4">{{ $loop->iteration }}</td>
-
-                        {{-- Nama anggota yang terkena denda --}}
                         <td class="px-4 py-4 font-medium">{{ $item->nama_anggota }}</td>
-
-                        {{-- Judul buku yang terlambat dikembalikan --}}
                         <td class="px-4 py-4">{{ $item->judul_buku }}</td>
-
-                        {{-- Jumlah hari keterlambatan --}}
                         <td class="px-4 py-4">
                             <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#dc2626;">
                                 {{ $item->hari_terlambat }} hari
                             </span>
                         </td>
-
-                        {{-- Besaran denda per hari --}}
                         <td class="px-4 py-4">Rp {{ number_format($item->denda_per_hari, 0, ',', '.') }}</td>
-
-                        {{-- Total denda yang harus dibayar --}}
                         <td class="px-4 py-4 font-bold text-red-600">Rp {{ number_format($item->total_denda, 0, ',', '.') }}</td>
-
-                        {{-- Badge status pembayaran denda --}}
                         <td class="px-4 py-4">
                             @if($item->status_bayar == 'belum_bayar')
                                 <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#dc2626;">Belum Bayar</span>
@@ -145,25 +100,16 @@
                                 <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#16a34a;">Sudah Bayar</span>
                             @endif
                         </td>
-
-                        {{-- Tombol aksi: konfirmasi pembayaran dan cetak bukti denda --}}
                         <td class="px-4 py-4">
                             <div class="flex gap-2 items-center">
-
                                 @if($item->status_bayar == 'belum_bayar')
-                                {{-- Tombol konfirmasi pembayaran denda oleh petugas --}}
                                 <form action="{{ route('denda.konfirmasi', $item->id) }}" method="POST" onsubmit="return confirm('Konfirmasi pembayaran denda ini?')">
                                     @csrf
-                                    <button type="submit" class="text-white px-3 py-1 rounded text-xs font-medium" style="background-color:#16a34a;">
-                                        ✓ Konfirmasi
-                                    </button>
+                                    <button type="submit" class="text-white px-3 py-1 rounded text-xs font-medium" style="background-color:#16a34a;">✓ Konfirmasi</button>
                                 </form>
                                 @else
-                                    {{-- Denda sudah lunas --}}
                                     <span class="text-gray-400 text-xs">Lunas ✓</span>
                                 @endif
-
-                                {{-- Tombol cetak bukti denda ke printer --}}
                                 <button
                                     onclick="cetakDenda('{{ addslashes($item->nama_anggota) }}', '{{ addslashes($item->judul_buku) }}', {{ $item->hari_terlambat }}, {{ $item->denda_per_hari }}, {{ $item->total_denda }}, '{{ $item->status_bayar }}')"
                                     class="text-white px-3 py-1 rounded text-xs font-medium"
@@ -174,7 +120,6 @@
                         </td>
                     </tr>
                     @empty
-                    {{-- Tampilan jika tidak ada denda --}}
                     <tr>
                         <td colspan="8" class="text-center py-8 text-gray-400">
                             <div class="flex flex-col items-center gap-2">
@@ -189,14 +134,11 @@
         </main>
     </div>
 
-    {{-- SCRIPT: Fungsi cetak bukti denda ke jendela baru --}}
     <script>
     function cetakDenda(nama, judul, hari, dendaPerHari, total, status) {
         const statusLabel = status === 'belum_bayar' ? 'Belum Bayar' : 'Sudah Bayar';
         const statusColor = status === 'belum_bayar' ? '#dc2626' : '#16a34a';
         const tanggal = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
-
-        {{-- Buka jendela baru untuk tampilan cetak --}}
         const win = window.open('', '_blank');
         win.document.write(`
             <!DOCTYPE html>
@@ -209,40 +151,3 @@
                     h2 { text-align: center; color: #db2777; margin-bottom: 4px; }
                     p.sub { text-align: center; color: #888; font-size: 13px; margin-bottom: 30px; }
                     hr { border: 1px solid #db2777; margin-bottom: 24px; }
-                    table { width: 100%; border-collapse: collapse; }
-                    td { padding: 10px 14px; border: 1px solid #e5e7eb; font-size: 14px; }
-                    td:first-child { background: #fdf2f8; font-weight: bold; width: 40%; }
-                    .status { display: inline-block; padding: 4px 12px; border-radius: 999px; color: white; font-size: 13px; background-color: ${statusColor}; }
-                    .total { color: #dc2626; font-weight: bold; font-size: 15px; }
-                    .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #aaa; }
-                    @media print { button { display: none; } }
-                </style>
-            </head>
-            <body>
-                <h2>Perpustakaan Digital</h2>
-                <p class="sub">Bukti Denda Keterlambatan Pengembalian Buku</p>
-                <hr>
-                <table>
-                    <tr><td>Nama Anggota</td><td>${nama}</td></tr>
-                    <tr><td>Judul Buku</td><td>${judul}</td></tr>
-                    <tr><td>Hari Terlambat</td><td>${hari} hari</td></tr>
-                    <tr><td>Denda / Hari</td><td>Rp ${Number(dendaPerHari).toLocaleString('id-ID')}</td></tr>
-                    <tr><td>Total Denda</td><td class="total">Rp ${Number(total).toLocaleString('id-ID')}</td></tr>
-                    <tr><td>Status</td><td><span class="status">${statusLabel}</span></td></tr>
-                </table>
-                <div class="footer">Dicetak pada: ${tanggal}</div>
-                <br>
-                <div style="text-align:center;">
-                    <button onclick="window.print()" style="background:#db2777;color:white;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;">
-                        🖨️ Print
-                    </button>
-                </div>
-            </body>
-            </html>
-        `);
-        win.document.close();
-    }
-    </script>
-
-</body>
-</html>

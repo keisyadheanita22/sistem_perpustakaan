@@ -3,62 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dashboard Kepala')</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <title>@yield('title') - Perpustakaan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-50">
 
-    {{-- Navbar --}}
-    <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
-        <span class="text-white font-bold text-lg">Perpustakaan Digital</span>
-        <span class="text-white text-sm">{{ auth()->user()->name }}</span>
-    </nav>
-
-    <div class="flex flex-1">
-
-        {{-- Sidebar --}}
-        <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height: calc(100vh - 56px);">
-            <a href="{{ route('kepala.dashboard') }}"
-                class="mx-3 px-4 py-2 rounded text-white text-sm text-center {{ request()->routeIs('kepala.dashboard') ? 'font-bold' : '' }}"
-                style="background-color:{{ request()->routeIs('kepala.dashboard') ? '#831843' : '#9d174d' }}">
-                Dashboard
-            </a>
-            <a href="{{ route('kepala.katalog') }}"
-                class="mx-3 px-4 py-2 rounded text-white text-sm text-center {{ request()->routeIs('kepala.katalog') ? 'font-bold' : '' }}"
-                style="background-color:{{ request()->routeIs('kepala.katalog') ? '#831843' : '#9d174d' }}">
-                Katalog Buku
-            </a>
-            
-            <a href="#"
-                class="mx-3 px-4 py-2 rounded text-white text-sm text-center"
-                style="background-color:#9d174d;">
-                Data Petugas
-            </a>
-            <a href="{{ route('kepala.laporan') }}"
-                class="mx-3 px-4 py-2 rounded text-white text-sm text-center"
-                style="background-color:#9d174d;">
-                Laporan
-            </a>
-
-            {{-- Logout --}}
-            <div class="mt-auto mx-3 pb-4">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded text-white text-sm" style="background-color:#9d174d;">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                        </svg>
-                        Logout
-                    </button>
-                </form>
+    <div class="flex min-h-screen">
+        <aside class="w-64 bg-white shadow-md border-r border-gray-200">
+            <div class="p-6">
+                <h2 class="text-xl font-bold text-pink-600 uppercase tracking-wider">SIPUS</h2>
             </div>
+            
+            <nav class="mt-2">
+                <a href="{{ route('dashboard') }}" class="flex items-center px-6 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors">
+                    <i class="fas fa-home w-5 mr-3"></i> Dashboard
+                </a>
+                
+                <a href="{{ route('petugas.index') }}" class="flex items-center px-6 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors">
+                    <i class="fas fa-user-shield w-5 mr-3"></i> Data Petugas
+                </a>
+                
+                <a href="{{ route('anggota.index') }}" class="flex items-center px-6 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors">
+                    <i class="fas fa-users w-5 mr-3"></i> Daftar Anggota
+                </a>
+                
+                <a href="{{ route('buku.index') }}" class="flex items-center px-6 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors">
+                    <i class="fas fa-book w-5 mr-3"></i> Katalog Buku
+                </a>
+                
+                <a href="{{ route('laporan.index') }}" class="flex items-center px-6 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-colors">
+                    <i class="fas fa-file-alt w-5 mr-3"></i> Laporan
+                </a>
+
+                <div class="mt-10 px-6">
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="flex items-center text-red-500 hover:text-red-700">
+                            <i class="fas fa-sign-out-alt w-5 mr-3"></i> Logout
+                        </button>
+                    </form>
+                </div>
+            </nav>
         </aside>
 
-        {{-- Konten Halaman --}}
-        <main class="flex-1 p-8">
+        <main class="flex-1 p-10">
             @yield('content')
         </main>
-
     </div>
 
 </body>

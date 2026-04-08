@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Anggota;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -10,8 +9,7 @@ use Illuminate\Support\Facades\Hash;
 class AnggotaController extends Controller
 {
     /**
-     * Tampilkan daftar anggota yang sudah registrasi
-     * Hanya bisa diakses oleh petugas
+     * Untuk PETUGAS
      */
     public function index(Request $request)
     {
@@ -25,8 +23,21 @@ class AnggotaController extends Controller
     }
 
     /**
-     * Hapus anggota dari tabel users
-     * Hanya bisa diakses oleh petugas
+     * Untuk KEPALA — view berbeda!
+     */
+    public function indexKepala(Request $request)
+    {
+        $anggota = User::where('role', 'anggota')
+            ->when($request->search, function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%')
+                      ->orWhere('email', 'like', '%' . $request->search . '%');
+            })->get();
+
+        return view('kepala.anggota.index', compact('anggota'));
+    }
+
+    /**
+     * Hapus anggota
      */
     public function destroy($id)
     {

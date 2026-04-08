@@ -9,23 +9,32 @@ use Illuminate\Http\Request;
 
 class PeminjamanController extends Controller
 {
+    // ===== PETUGAS: Tampilkan semua data peminjaman =====
     public function index()
     {
         $search = request('search');
+
+        // Ambil semua peminjaman, beserta relasi buku-nya
+        // Kalau ada pencarian, filter berdasarkan nama anggota
         $peminjamans = Peminjaman::with('buku')
             ->when($search, function($query) use ($search) {
                 $query->where('nama_anggota', 'like', '%' . $search . '%');
             })->get();
+
         return view('petugas.peminjaman.index', compact('peminjamans'));
     }
 
+    // ===== PETUGAS: Halaman form tambah peminjaman =====
     public function create()
     {
+        // Hanya tampilkan buku yang stoknya masih ada
         $anggota = Anggota::all();
         $bukus = Buku::where('stok', '>', 0)->get();
+
         return view('petugas.peminjaman.create', compact('anggota', 'bukus'));
     }
 
+    // ===== PETUGAS: Simpan peminjaman baru (input manual oleh petugas) =====
     public function store(Request $request)
     {
         $request->validate([
@@ -35,12 +44,23 @@ class PeminjamanController extends Controller
             'tanggal_kembali' => 'required|date',
         ]);
 
-        // Generate ID otomatis (PM001, PM002, dst)
+        $anggota = Anggota::findOrFail($request->anggota_id);
+
+        // Cek apakah anggota masih punya peminjaman aktif (status menunggu atau dipinjam)
+        // Kalau masih ada, tidak boleh pinjam buku baru
+        $masihAktif = Peminjaman::where('id_anggota', $anggota->id_anggota)
+            ->whereIn('status', ['menunggu', 'dipinjam'])
+            ->exists();
+
+        if ($masihAktif) {
+            return redirect()->back()
+                ->with('error', 'Anggota ini masih punya peminjaman aktif, selesaikan dulu sebelum pinjam lagi!');
+        }
+
+        // Generate ID peminjaman otomatis: PM001, PM002, dst
         $last = Peminjaman::orderBy('id', 'desc')->first();
         $newNumber = $last ? (int)substr($last->id_peminjaman, 2) + 1 : 1;
         $idPeminjaman = 'PM' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
-
-        $anggota = Anggota::findOrFail($request->anggota_id);
 
         Peminjaman::create([
             'id_peminjaman'   => $idPeminjaman,
@@ -49,23 +69,35 @@ class PeminjamanController extends Controller
             'buku_id'         => $request->buku_id,
             'tanggal_pinjam'  => $request->tanggal_pinjam,
             'tanggal_kembali' => $request->tanggal_kembali,
-            'status'          => 'dipinjam', // Petugas input langsung = dipinjam
+            'status'          => 'dipinjam', // Petugas input langsung = langsung dipinjam (tidak perlu verifikasi)
         ]);
 
-        // Kurangi stok buku
+        // Kurangi stok buku karena langsung dipinjam
         $buku = Buku::findOrFail($request->buku_id);
         $buku->decrement('stok');
 
-        return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil ditambahkan!');
+        return redirect()->route('peminjaman.index')
+            ->with('success', 'Peminjaman berhasil ditambahkan!');
     }
 
-    // Anggota meminjam buku dari katalog
+    // ===== ANGGOTA: Pinjam buku dari halaman katalog =====
     public function pinjam($buku_id)
     {
         $buku = Buku::findOrFail($buku_id);
         $user = auth()->user();
 
-        // Generate ID otomatis
+        // Cek apakah anggota masih punya peminjaman aktif (status menunggu atau dipinjam)
+        // Kalau masih ada, tidak boleh pinjam buku baru
+        $masihAktif = Peminjaman::where('id_anggota', $user->id_anggota)
+            ->whereIn('status', ['menunggu', 'dipinjam'])
+            ->exists();
+
+        if ($masihAktif) {
+            return redirect()->route('katalog.index')
+                ->with('error', 'Kamu masih punya peminjaman aktif, selesaikan dulu sebelum pinjam lagi!');
+        }
+
+        // Generate ID peminjaman otomatis: PM001, PM002, dst
         $last = Peminjaman::orderBy('id', 'desc')->first();
         $newNumber = $last ? (int)substr($last->id_peminjaman, 2) + 1 : 1;
         $idPeminjaman = 'PM' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
@@ -76,20 +108,22 @@ class PeminjamanController extends Controller
             'nama_anggota'    => $user->name,
             'buku_id'         => $buku->id,
             'tanggal_pinjam'  => now(),
-            'tanggal_kembali' => now()->addDays(7), // Batas kembali 7 hari
-            'status'          => 'menunggu', // Tunggu verifikasi petugas dulu
+            'tanggal_kembali' => now()->addDays(7), // Batas kembali otomatis 7 hari
+            'status'          => 'menunggu', // Anggota pinjam = menunggu, harus diverifikasi petugas dulu
         ]);
-        // Stok belum dikurangi, dikurangi saat petugas verifikasi
+        // Catatan: stok belum dikurangi di sini, dikurangi nanti saat petugas verifikasi
 
-        return redirect()->route('katalog.index')->with('success', 'Permintaan peminjaman berhasil dikirim, tunggu verifikasi petugas!');
+        return redirect()->route('katalog.index')
+            ->with('success', 'Permintaan peminjaman berhasil dikirim, tunggu verifikasi petugas!');
     }
 
-    // Halaman "Peminjaman Saya" untuk anggota
+    // ===== ANGGOTA: Halaman "Peminjaman Saya" =====
     public function peminjamanSaya()
     {
         $user = auth()->user();
 
-        // Ambil semua peminjaman milik anggota yang sedang login
+        // Ambil semua riwayat peminjaman milik anggota yang sedang login
+        // Diurutkan dari yang terbaru
         $peminjamans = Peminjaman::with('buku')
             ->where('nama_anggota', $user->name)
             ->latest()
@@ -98,32 +132,31 @@ class PeminjamanController extends Controller
         return view('anggota.peminjaman.index', compact('peminjamans'));
     }
 
-    // Anggota klik tombol "Kembalikan"
-    // Status berubah jadi 'mengembalikan', tunggu verifikasi petugas
+    // ===== ANGGOTA: Klik tombol "Kembalikan" =====
     public function kembalikan($id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
 
-        // Hanya bisa dikembalikan jika status masih 'dipinjam'
+        // Hanya bisa dikembalikan kalau statusnya masih 'dipinjam'
         if ($peminjaman->status !== 'dipinjam') {
             return redirect()->route('peminjaman.saya')
                 ->with('error', 'Buku tidak bisa dikembalikan!');
         }
 
-        // Ubah status jadi 'mengembalikan', stok belum naik
-        // Stok naik setelah petugas verifikasi
+        // Ubah status jadi 'mengembalikan', tunggu konfirmasi petugas
+        // Stok belum naik, naik nanti setelah petugas verifikasi
         $peminjaman->update(['status' => 'mengembalikan']);
 
         return redirect()->route('peminjaman.saya')
             ->with('success', 'Permintaan pengembalian dikirim, tunggu verifikasi petugas!');
     }
 
-    // Anggota batalkan peminjaman
-    // Hanya bisa jika status masih 'menunggu' (belum diverifikasi petugas)
+    // ===== ANGGOTA: Batalkan peminjaman =====
     public function batalkan($id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
 
+        // Hanya bisa dibatalkan kalau statusnya masih 'menunggu' (belum diverifikasi petugas)
         if ($peminjaman->status !== 'menunggu') {
             return redirect()->route('peminjaman.saya')
                 ->with('error', 'Peminjaman tidak bisa dibatalkan!');
@@ -135,45 +168,55 @@ class PeminjamanController extends Controller
             ->with('success', 'Peminjaman berhasil dibatalkan!');
     }
 
-    // Petugas verifikasi peminjaman baru dari anggota
-    // Status: menunggu -> dipinjam, stok buku dikurangi
+    // ===== PETUGAS: Verifikasi peminjaman baru dari anggota =====
+    // Alur: menunggu -> dipinjam, stok buku dikurangi
     public function verifikasi($id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
         $buku = Buku::findOrFail($peminjaman->buku_id);
 
+        // Ubah status jadi 'dipinjam'
         $peminjaman->update(['status' => 'dipinjam']);
-        $buku->decrement('stok'); // Stok dikurangi saat diverifikasi
 
-        return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil diverifikasi!');
+        // Baru kurangi stok setelah diverifikasi petugas
+        $buku->decrement('stok');
+
+        return redirect()->route('peminjaman.index')
+            ->with('success', 'Peminjaman berhasil diverifikasi!');
     }
 
-    // Petugas verifikasi pengembalian buku dari anggota
-    // Status: mengembalikan -> dikembalikan, stok buku bertambah
+    // ===== PETUGAS: Verifikasi pengembalian buku dari anggota =====
+    // Alur: mengembalikan -> dikembalikan, stok buku bertambah
     public function verifikasiKembali($id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
 
-        // Pastikan statusnya memang 'mengembalikan'
+        // Pastikan statusnya memang 'mengembalikan' sebelum diproses
         if ($peminjaman->status !== 'mengembalikan') {
             return redirect()->route('peminjaman.index')
                 ->with('error', 'Status tidak valid untuk diverifikasi!');
         }
 
+        // Ubah status jadi 'dikembalikan'
         $peminjaman->update(['status' => 'dikembalikan']);
-        $peminjaman->buku->increment('stok'); // Stok naik setelah dikonfirmasi kembali
+
+        // Tambah stok buku setelah pengembalian dikonfirmasi
+        $peminjaman->buku->increment('stok');
 
         return redirect()->route('peminjaman.index')
             ->with('success', 'Pengembalian buku berhasil diverifikasi!');
     }
 
+    // ===== PETUGAS: Halaman form edit peminjaman =====
     public function edit(Peminjaman $peminjaman)
     {
         $anggota = Anggota::all();
         $bukus = Buku::all();
+
         return view('petugas.peminjaman.edit', compact('peminjaman', 'anggota', 'bukus'));
     }
 
+    // ===== PETUGAS: Simpan perubahan data peminjaman =====
     public function update(Request $request, Peminjaman $peminjaman)
     {
         $request->validate([
@@ -183,12 +226,16 @@ class PeminjamanController extends Controller
 
         $peminjaman->update($request->all());
 
-        return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil diupdate!');
+        return redirect()->route('peminjaman.index')
+            ->with('success', 'Peminjaman berhasil diupdate!');
     }
 
+    // ===== PETUGAS: Hapus data peminjaman =====
     public function destroy(Peminjaman $peminjaman)
     {
         $peminjaman->delete();
-        return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil dihapus!');
+
+        return redirect()->route('peminjaman.index')
+            ->with('success', 'Peminjaman berhasil dihapus!');
     }
 }

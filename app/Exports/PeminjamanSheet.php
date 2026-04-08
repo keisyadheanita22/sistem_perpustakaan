@@ -3,40 +3,25 @@
 namespace App\Exports;
 
 use App\Models\Peminjaman;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
+use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class PeminjamanSheet implements FromCollection, WithHeadings, WithTitle
+class PeminjamanSheet implements FromView, WithTitle, ShouldAutoSize
 {
-    public function __construct(
-        protected $bulan = null,
-        protected $tahun = null
-    ) {}
+    public function __construct(protected $bulan, protected $tahun) {}
 
     public function title(): string { return 'Peminjaman'; }
 
-    public function headings(): array
+    public function view(): View
     {
-        return ['No', 'ID Peminjaman', 'Nama Anggota', 'Buku', 'Tgl Pinjam', 'Tgl Kembali', 'Status'];
-    }
+        $peminjamans = Peminjaman::with('buku')
+            ->when($this->bulan, function ($query) {
+                $query->whereMonth('tanggal_pinjam', $this->bulan)
+                      ->whereYear('tanggal_pinjam', $this->tahun ?? now()->year);
+            })->get();
 
-    public function collection()
-    {
-        return Peminjaman::with('buku')
-            ->when($this->bulan, fn($q) => $q
-                ->whereMonth('tanggal_pinjam', $this->bulan)
-                ->whereYear('tanggal_pinjam', $this->tahun ?? now()->year))
-            ->latest()
-            ->get()
-            ->map(fn($p, $i) => [
-                $i + 1,
-                $p->id_peminjaman,
-                $p->nama_anggota,
-                $p->buku->judul ?? '-',
-                $p->tanggal_pinjam,
-                $p->tanggal_kembali ?? '-',
-                $p->status,
-            ]);
+        return view('kepala.exports.peminjaman-excel', compact('peminjamans'));
     }
 }

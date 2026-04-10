@@ -5,85 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login — Perpustakaan Digital</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body style="margin:0;padding:0;font-family:'DM Sans',sans-serif;background-color:#fce7f3;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;">
 
-    {{-- Navbar --}}
-    <nav class="bg-pink-500 px-8 h-14 flex items-center">
-        <span class="text-white font-bold text-lg">Perpustakaan Digital</span>
+    <!-- Navbar (sama seperti register) -->
+    <nav style="padding:0 2rem;height:56px;display:flex;align-items:center;background-color:#db2777;position:relative;z-index:10;">
+        <span style="color:white;font-weight:700;font-size:1.125rem;font-style:italic;">Perpustakaan Digital</span>
     </nav>
 
-    {{-- Main --}}
-    <main class="flex-1 flex items-center justify-center">
-        <div class="bg-white rounded-2xl shadow-lg p-10 w-full" style="max-width:420px">
+    <!-- Main -->
+    <main style="flex:1;display:flex;align-items:center;justify-content:center;padding:2.5rem 1rem;position:relative;z-index:1;">
+        <div style="width:100%;max-width:440px;">
 
-            <h1 class="text-2xl font-semibold text-center text-gray-800 mb-1">Login</h1>
-            <p class="text-center text-gray-400 text-sm mb-6">
-                Selamat Datang Silahkan Masukan Username dan Password<br>
-                anda untuk melakukan login
-            </p>
+            <!-- Ilustrasi buku -->
+            <div style="display:flex;gap:4px;align-items:flex-end;margin-bottom:1.25rem;">
+                <div style="width:22px;height:52px;background:#f9a8d4;border-radius:3px 5px 5px 3px;position:relative;"><div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:rgba(0,0,0,0.1);border-radius:3px 0 0 3px;"></div></div>
+                <div style="width:18px;height:66px;background:#db2777;border-radius:3px 5px 5px 3px;position:relative;"><div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:rgba(0,0,0,0.15);border-radius:3px 0 0 3px;"></div></div>
+                <div style="width:20px;height:46px;background:#fbcfe8;border-radius:3px 5px 5px 3px;position:relative;"><div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:rgba(0,0,0,0.08);border-radius:3px 0 0 3px;"></div></div>
+                <div style="width:16px;height:58px;background:#ec4899;border-radius:3px 5px 5px 3px;position:relative;"><div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:rgba(0,0,0,0.12);border-radius:3px 0 0 3px;"></div></div>
+                <div style="width:22px;height:40px;background:#fda4af;border-radius:3px 5px 5px 3px;position:relative;"><div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:rgba(0,0,0,0.09);border-radius:3px 0 0 3px;"></div></div>
+            </div>
 
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
+            <!-- Heading -->
+            <p style="font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:#db2777;font-weight:500;margin:0 0 4px;">Selamat Datang</p>
+            <h1 style="font-family:'Playfair Display',serif;font-size:1.9rem;color:#1a1014;line-height:1.2;margin:0 0 6px;">Masuk ke <em style="font-style:italic;color:#db2777;">Akunmu</em></h1>
+            <p style="font-size:0.875rem;color:#9d7f8a;margin:0 0 1.75rem;">Masukkan username dan password untuk melanjutkan.</p>
 
-                {{-- Username atau Email --}}
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Username / Email</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
-                        </span>
-                        <input type="text" name="login" value="{{ old('login') }}"
-                            class="w-full border border-gray-300 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                            placeholder="Masukkan Username atau Email"/>
+            <!-- Card -->
+            <div style="background:white;border-radius:20px;padding:2rem 2.25rem;box-shadow:0 8px 32px rgba(219,39,119,0.18),0 2px 8px rgba(0,0,0,0.08);border:1px solid #f3e8ee;">
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+
+                    <!-- Username / Email -->
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block;font-size:0.78rem;font-weight:500;color:#5a4050;margin-bottom:5px;">Username / Email</label>
+                        <div style="position:relative;">
+                            <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:#d4a0b8;pointer-events:none;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            <input type="text" name="login" value="{{ old('login') }}" placeholder="Username atau Email"
+                                style="width:100%;border:1.5px solid #f0dce7;border-radius:10px;padding:9px 12px 9px 34px;font-size:0.875rem;font-family:'DM Sans',sans-serif;color:#1a1014;background:#fffbfd;outline:none;box-sizing:border-box;"
+                                onfocus="this.style.borderColor='#db2777';this.style.boxShadow='0 0 0 3px rgba(219,39,119,0.1)';"
+                                onblur="this.style.borderColor='#f0dce7';this.style.boxShadow='none';"/>
+                        </div>
+                        @error('login') <p style="font-size:0.72rem;color:#e11d48;margin-top:4px;">{{ $message }}</p> @enderror
                     </div>
-                    @error('login')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
 
-                {{-- Password --}}
-                <div class="mb-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                            </svg>
-                        </span>
-                        <input type="password" name="password"
-                            class="w-full border border-gray-300 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-                            placeholder="Masukkan Password Anda"/>
+                    <!-- Password -->
+                    <div style="margin-bottom:1.5rem;">
+                        <label style="display:block;font-size:0.78rem;font-weight:500;color:#5a4050;margin-bottom:5px;">Password</label>
+                        <div style="position:relative;">
+                            <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:#d4a0b8;pointer-events:none;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <input type="password" name="password" placeholder="••••••••"
+                                style="width:100%;border:1.5px solid #f0dce7;border-radius:10px;padding:9px 12px 9px 34px;font-size:0.875rem;font-family:'DM Sans',sans-serif;color:#1a1014;background:#fffbfd;outline:none;box-sizing:border-box;"
+                                onfocus="this.style.borderColor='#db2777';this.style.boxShadow='0 0 0 3px rgba(219,39,119,0.1)';"
+                                onblur="this.style.borderColor='#f0dce7';this.style.boxShadow='none';"/>
+                        </div>
+                        @error('password') <p style="font-size:0.72rem;color:#e11d48;margin-top:4px;">{{ $message }}</p> @enderror
                     </div>
-                    @error('password')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
 
-                {{-- Lupa Password --}}
-                <div class="text-right mb-5">
-                    <a href="{{ route('password.request') }}" class="text-pink-500 text-sm hover:underline">
-                        Lupa password?
-                    </a>
-                </div>
+                    <!-- Submit -->
+                    <button type="submit"
+                        style="width:100%;padding:11px;background:#db2777;color:white;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;border:none;border-radius:10px;cursor:pointer;letter-spacing:0.02em;box-shadow:0 4px 16px rgba(219,39,119,0.25);"
+                        onmouseover="this.style.background='#be185d';this.style.boxShadow='0 6px 20px rgba(219,39,119,0.35)';"
+                        onmouseout="this.style.background='#db2777';this.style.boxShadow='0 4px 16px rgba(219,39,119,0.25)';">
+                        Masuk
+                    </button>
 
-                {{-- Tombol Masuk --}}
-                <button type="submit"
-                    class="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 rounded-lg transition">
-                    Masuk
-                </button>
+                    <p style="text-align:center;font-size:0.82rem;color:#9d7f8a;margin-top:1.25rem;margin-bottom:0;">
+                        Belum punya akun?
+                        <a href="{{ route('register') }}" style="color:#db2777;font-weight:500;text-decoration:none;">Daftar sekarang</a>
+                    </p>
 
-                {{-- Daftar --}}
-                <p class="text-center text-sm text-gray-500 mt-4">
-                    Belum mempunyai akun?
-                    <a href="{{ route('register') }}" class="text-pink-500 font-medium hover:underline">
-                        Daftar sekarang
-                    </a>
-                </p>
+                </form>
+            </div>
 
-            </form>
         </div>
     </main>
 

@@ -42,7 +42,21 @@
             <a href="{{ route('anggota.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Anggota</a>
 
             {{-- Menu Peminjaman --}}
-            <a href="{{ route('peminjaman.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Peminjaman</a>
+            {{-- Ditambah badge notifikasi kalau ada yang perlu diverifikasi --}}
+            <a href="{{ route('peminjaman.index') }}"
+               class="mx-3 px-4 py-2 rounded text-white text-sm text-center flex items-center justify-center gap-2"
+               style="background-color:#9d174d;">
+                Peminjaman
+
+                {{-- Badge angka hanya muncul kalau ada status 'menunggu' atau 'mengembalikan' --}}
+                @if(!empty($perluVerifikasi) && $perluVerifikasi > 0)
+                    <span style="background-color:white; color:#db2777;"
+                          class="text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center leading-none">
+                        {{-- Kalau lebih dari 9, tampilkan '9+' supaya badge tidak melar --}}
+                        {{ $perluVerifikasi > 9 ? '9+' : $perluVerifikasi }}
+                    </span>
+                @endif
+            </a>
 
             {{-- Menu Kategori --}}
             <a href="{{ route('kategori.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Kategori</a>

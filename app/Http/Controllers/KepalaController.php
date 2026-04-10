@@ -11,6 +11,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanExport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class KepalaController extends Controller
 {
@@ -37,7 +39,7 @@ class KepalaController extends Controller
     }
 
     // =====================
-    // KATALOG ✅ SUDAH DIPERBAIKI
+    // KATALOG
     // =====================
     public function katalog(Request $request)
     {
@@ -53,7 +55,6 @@ class KepalaController extends Controller
 
         $kategoris = Kategori::all();
 
-        // 🔥 FIX DI SINI
         return view('kepala.katalog.index', compact('bukus', 'kategoris'));
     }
 
@@ -149,7 +150,7 @@ class KepalaController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:8|confirmed',
         ]);
 
         User::create([
@@ -179,8 +180,6 @@ class KepalaController extends Controller
             'password' => 'nullable|min:6|confirmed',
         ]);
 
-        
-
         $petugas->update([
             'name'  => $request->name,
             'email' => $request->email,
@@ -200,5 +199,69 @@ class KepalaController extends Controller
 
         return redirect()->route('kepala.petugas.index')
                          ->with('success', 'Petugas berhasil dihapus!');
+    }
+
+    // =====================
+    // PROFIL KEPALA
+    // =====================
+    public function profil()
+    {
+        return view('kepala.profil', ['user' => auth()->user()]);
+    }
+
+    public function updateProfil(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        $user->update([
+            'name'  => $request->name,
+            'email' => $request->email,
+        ]);
+
+        return back()->with('success', 'Profil berhasil diperbarui!');
+    }
+
+    public function gantiPassword(Request $request)
+    {
+        $request->validate([
+            'password_lama'         => 'required',
+            'password'              => 'required|min:6|confirmed',
+            'password_confirmation' => 'required',
+        ]);
+
+        if (!Hash::check($request->password_lama, auth()->user()->password)) {
+            return back()->withErrors(['password_lama' => 'Password lama tidak cocok!']);
+        }
+
+        auth()->user()->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return back()->with('success', 'Password berhasil diubah!');
+    }
+
+    public function updateFoto(Request $request)
+    {
+        $request->validate([
+            'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = auth()->user();
+
+        // Hapus foto lama kalau ada
+        if ($user->foto && Storage::disk('public')->exists($user->foto)) {
+            Storage::disk('public')->delete($user->foto);
+        }
+
+        $path = $request->file('foto')->store('foto-profil', 'public');
+
+        $user->update(['foto' => $path]);
+
+        return back()->with('success', 'Foto berhasil diperbarui!');
     }
 }

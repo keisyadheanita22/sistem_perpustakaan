@@ -8,18 +8,18 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR: Menampilkan nama sistem dan inisial user --}}
+    {{-- NAVBAR: Nama sistem dan avatar kepala --}}
     <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
         <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
 
-        {{-- Foto profil atau inisial kepala --}}
-        <a href="#" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
+        {{-- Foto profil atau inisial, klik ke halaman profil kepala --}}
+        <a href="{{ route('kepala.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
             @if(Auth::user()->foto)
                 <img src="{{ asset('storage/' . Auth::user()->foto) }}"
                      class="w-8 h-8 rounded-full object-cover">
             @else
                 <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
-                    style="background-color:#9d174d;">
+                     style="background-color:#9d174d;">
                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
             @endif
@@ -29,25 +29,21 @@
 
     <div class="flex flex-1">
 
-        {{-- SIDEBAR: Menu navigasi utama untuk kepala --}}
-        <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height: calc(100vh - 56px);">
+        {{-- SIDEBAR: Menu navigasi kepala --}}
+        <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height:calc(100vh - 56px);">
 
-            {{-- Menu Dashboard (aktif/highlight) --}}
+            {{-- Menu aktif --}}
             <a href="{{ route('kepala.dashboard') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center font-bold" style="background-color:#831843;">Dashboard</a>
 
-            {{-- Menu Data Petugas --}}
             <a href="{{ route('kepala.petugas.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Petugas</a>
 
-            {{-- Menu Katalog Buku --}}
             <a href="{{ route('kepala.katalog') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Katalog Buku</a>
 
-            {{-- Menu Daftar Anggota --}}
             <a href="{{ route('kepala.anggota.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Daftar Anggota</a>
 
-            {{-- Menu Laporan --}}
             <a href="{{ route('kepala.laporan') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Laporan</a>
 
-            {{-- Tombol Logout di bagian bawah sidebar --}}
+            {{-- Tombol logout di bawah sidebar --}}
             <div class="mt-auto mx-3 pb-4">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -69,7 +65,7 @@
                 <p class="text-gray-500 text-sm mt-1">Selamat datang, {{ Auth::user()->name }}! 👋</p>
             </div>
 
-            {{-- KARTU STATISTIK: Menampilkan total buku, anggota, petugas, dan peminjaman aktif --}}
+            {{-- KARTU STATISTIK: 4 kartu untuk kepala (buku, anggota, petugas, peminjaman aktif) --}}
             <div class="grid grid-cols-4 gap-6 mb-8">
 
                 {{-- Kartu Total Buku --}}
@@ -82,7 +78,7 @@
                     </div>
                 </div>
 
-                {{-- Kartu Total Anggota yang terdaftar --}}
+                {{-- Kartu Total Anggota --}}
                 <div class="bg-white rounded-xl shadow p-6 flex items-center gap-4 border-l-4" style="border-color:#db2777;">
                     <div class="rounded-full p-3 text-white text-2xl" style="background-color:#db2777;">👤</div>
                     <div>
@@ -92,7 +88,7 @@
                     </div>
                 </div>
 
-                {{-- Kartu Total Petugas yang terdaftar --}}
+                {{-- Kartu Total Petugas --}}
                 <div class="bg-white rounded-xl shadow p-6 flex items-center gap-4 border-l-4" style="border-color:#db2777;">
                     <div class="rounded-full p-3 text-white text-2xl" style="background-color:#db2777;">🛡️</div>
                     <div>
@@ -102,7 +98,7 @@
                     </div>
                 </div>
 
-                {{-- Kartu Peminjaman yang sedang aktif --}}
+                {{-- Kartu Peminjaman Aktif --}}
                 <div class="bg-white rounded-xl shadow p-6 flex items-center gap-4 border-l-4" style="border-color:#db2777;">
                     <div class="rounded-full p-3 text-white text-2xl" style="background-color:#db2777;">📖</div>
                     <div>
@@ -126,7 +122,7 @@
                             🛡️ Tambah Petugas Baru
                         </a>
 
-                        {{-- Shortcut ke halaman daftar anggota --}}
+                        {{-- Shortcut ke daftar anggota --}}
                         <a href="{{ route('kepala.anggota.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm font-medium transition hover:opacity-90" style="background-color:#9d174d;">
                             👤 Daftar Anggota
                         </a>
@@ -169,6 +165,7 @@
                     </div>
                 </div>
             </div>
+
         </main>
     </div>
 

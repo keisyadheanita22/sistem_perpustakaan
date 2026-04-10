@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan – Sistem Perpustakaan</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js']) 
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -24,20 +24,23 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR --}}
-    <nav class="px-8 h-14 flex items-center justify-between print-hidden" style="background-color:#db2777;">
-        <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
-        <a href="{{ route('kepala.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
-            @if(Auth::user()->foto)
-                <img src="{{ asset('storage/' . Auth::user()->foto) }}" class="w-8 h-8 rounded-full object-cover">
-            @else
-                <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style="background-color:#9d174d;">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </div>
-            @endif
-            <span>{{ Auth::user()->name }}</span>
-        </a>
-    </nav>
+  {{-- NAVBAR --}}
+<nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
+    <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
+    <a href="{{ route('kepala.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
+        @if(Auth::user()->foto)
+            <img src="{{ asset('storage/' . Auth::user()->foto) }}"
+                 style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+        @else
+            <div style="width:32px; height:32px; border-radius:50%; background-color:#9d174d;
+                        display:flex; align-items:center; justify-content:center;
+                        font-size:14px; font-weight:700; color:white;">
+                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+            </div>
+        @endif
+        <span>{{ Auth::user()->name }}</span>
+    </a>
+</nav>
 
     <div class="flex flex-1">
 

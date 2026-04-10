@@ -10,19 +10,20 @@ use Illuminate\Http\Request;
 class PeminjamanController extends Controller
 {
     // ===== PETUGAS: Tampilkan semua data peminjaman =====
-    public function index()
-    {
-        $search = request('search');
+   public function index()
+{
+    $search = request('search');
 
-        // Ambil semua peminjaman, beserta relasi buku-nya
-        // Kalau ada pencarian, filter berdasarkan nama anggota
-        $peminjamans = Peminjaman::with('buku')
-            ->when($search, function($query) use ($search) {
-                $query->where('nama_anggota', 'like', '%' . $search . '%');
-            })->get();
+    $peminjamans = Peminjaman::with('buku')
+        ->when($search, function($query) use ($search) {
+            $query->where('nama_anggota', 'like', '%' . $search . '%');
+        })->get();
 
-        return view('petugas.peminjaman.index', compact('peminjamans'));
-    }
+    // Hitung yang perlu diverifikasi
+    $perluVerifikasi = Peminjaman::whereIn('status', ['menunggu', 'mengembalikan'])->count();
+
+    return view('petugas.peminjaman.index', compact('peminjamans', 'perluVerifikasi'));
+}
 
     // ===== PETUGAS: Halaman form tambah peminjaman =====
     public function create()
@@ -45,17 +46,6 @@ class PeminjamanController extends Controller
         ]);
 
         $anggota = Anggota::findOrFail($request->anggota_id);
-
-        // Cek apakah anggota masih punya peminjaman aktif (status menunggu atau dipinjam)
-        // Kalau masih ada, tidak boleh pinjam buku baru
-        $masihAktif = Peminjaman::where('id_anggota', $anggota->id_anggota)
-            ->whereIn('status', ['menunggu', 'dipinjam'])
-            ->exists();
-
-        if ($masihAktif) {
-            return redirect()->back()
-                ->with('error', 'Anggota ini masih punya peminjaman aktif, selesaikan dulu sebelum pinjam lagi!');
-        }
 
         // Generate ID peminjaman otomatis: PM001, PM002, dst
         $last = Peminjaman::orderBy('id', 'desc')->first();
@@ -85,17 +75,6 @@ class PeminjamanController extends Controller
     {
         $buku = Buku::findOrFail($buku_id);
         $user = auth()->user();
-
-        // Cek apakah anggota masih punya peminjaman aktif (status menunggu atau dipinjam)
-        // Kalau masih ada, tidak boleh pinjam buku baru
-        $masihAktif = Peminjaman::where('id_anggota', $user->id_anggota)
-            ->whereIn('status', ['menunggu', 'dipinjam'])
-            ->exists();
-
-        if ($masihAktif) {
-            return redirect()->route('katalog.index')
-                ->with('error', 'Kamu masih punya peminjaman aktif, selesaikan dulu sebelum pinjam lagi!');
-        }
 
         // Generate ID peminjaman otomatis: PM001, PM002, dst
         $last = Peminjaman::orderBy('id', 'desc')->first();

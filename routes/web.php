@@ -6,10 +6,11 @@ use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\DendaController;
+use App\Http\Controllers\KepalaController;
 use App\Http\Controllers\Anggota\KatalogController;
 use App\Http\Controllers\Anggota\ProfilAnggotaController;
 use App\Http\Controllers\Petugas\ProfilPetugasController;
-use App\Http\Controllers\KepalaController;
+use App\Http\Controllers\Kepala\ProfilKepalaController;
 use Illuminate\Support\Facades\Route;
 
 // =============================================================
@@ -99,6 +100,8 @@ Route::middleware(['auth'])->group(function () {
     // ROUTE KELOLA ANGGOTA - PETUGAS
     // ---------------------------------------------------------
     Route::get('/anggota', [AnggotaController::class, 'index'])->middleware('role:petugas')->name('anggota.index');
+    Route::get('/anggota/{id}/edit', [AnggotaController::class, 'edit'])->middleware('role:petugas')->name('anggota.edit');     // ← BARU
+    Route::put('/anggota/{id}', [AnggotaController::class, 'update'])->middleware('role:petugas')->name('anggota.update');      // ← BARU
     Route::delete('/anggota/{id}', [AnggotaController::class, 'destroy'])->middleware('role:petugas')->name('anggota.destroy');
 
     // ---------------------------------------------------------
@@ -117,7 +120,14 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:kepala'])->prefix('kepala')->name('kepala.')->group(function () {
     Route::get('/dashboard', [KepalaController::class, 'dashboard'])->name('dashboard');
     Route::get('/katalog', [KepalaController::class, 'katalog'])->name('katalog');
-    Route::get('/profil', [KepalaController::class, 'profil'])->name('profil');
+
+    // Profil Kepala
+    Route::get('/profil', [ProfilKepalaController::class, 'show'])->name('profil');
+    Route::put('/profil/update', [ProfilKepalaController::class, 'update'])->name('profil.update');
+    Route::put('/profil/password', [ProfilKepalaController::class, 'gantiPassword'])->name('profil.password');
+    Route::post('/profil/foto', [ProfilKepalaController::class, 'updateFoto'])->name('profil.foto');
+
+    // Laporan Kepala
     Route::get('/laporan', [KepalaController::class, 'laporan'])->name('laporan');
     Route::get('/laporan/pdf', [KepalaController::class, 'exportPdf'])->name('laporan.pdf');
     Route::get('/laporan/excel', [KepalaController::class, 'exportExcel'])->name('laporan.excel');
@@ -130,11 +140,15 @@ Route::middleware(['auth', 'role:kepala'])->prefix('kepala')->name('kepala.')->g
     Route::put('/petugas/{id}', [KepalaController::class, 'updatePetugas'])->name('petugas.update');
     Route::delete('/petugas/{id}', [KepalaController::class, 'destroyPetugas'])->name('petugas.destroy');
 
-    // ✅ FIX: pakai indexKepala bukan index (agar view kepala yang dipakai)
+    // Kelola Anggota (pakai indexKepala agar view kepala yang dipakai)
     Route::get('/anggota', [AnggotaController::class, 'indexKepala'])->name('anggota.index');
+    Route::get('/anggota/{id}/edit', [AnggotaController::class, 'editKepala'])->name('anggota.edit');   // ← BARU
+    Route::put('/anggota/{id}', [AnggotaController::class, 'updateKepala'])->name('anggota.update');    // ← BARU
 });
 
-// Debug & Profile Umum
+// =============================================================
+// DEBUG & PROFILE UMUM
+// =============================================================
 Route::get('/cek-role', function () { return auth()->user()->role; })->middleware('auth');
 Route::get('/profile', [ProfileController::class, 'edit'])->middleware('auth')->name('profile.edit');
 Route::patch('/profile', [ProfileController::class, 'update'])->middleware('auth')->name('profile.update');

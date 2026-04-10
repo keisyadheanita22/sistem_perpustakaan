@@ -67,9 +67,8 @@
                 {{ session('success') }}
             </div>
             @endif
-
-            {{--
-                Notifikasi error (muncul kalau anggota coba pinjam tapi masih ada peminjaman aktif)
+                        
+            {{--    Notifikasi error (muncul kalau anggota coba pinjam tapi masih ada peminjaman aktif)
                 Pesan errornya dikirim dari PeminjamanController@pinjam lewat ->with('error', '...')
             --}}
             @if(session('error'))
@@ -119,9 +118,9 @@
                     {{-- Cover buku: tampilkan foto kalau ada, kalau tidak tampilkan placeholder --}}
                     @if($buku->foto)
                         <img src="{{ asset('storage/' . $buku->foto) }}" alt="{{ $buku->judul }}"
-                            class="w-full object-cover" style="height:220px;">
+                            class="w-full object-cover" style="height:320px;">
                     @else
-                        <div class="w-full flex flex-col items-center justify-center" style="height:220px; background: linear-gradient(135deg, #fce7f3, #fbcfe8);">
+                        <div class="w-full flex flex-col items-center justify-center" style="height:320px; background: linear-gradient(135deg, #fce7f3, #fbcfe8);">
                             <span style="font-size:36px;">📚</span>
                             <span class="text-xs font-medium mt-1 px-2 text-center" style="color:#9d174d;">{{ Str::limit($buku->judul, 20) }}</span>
                         </div>

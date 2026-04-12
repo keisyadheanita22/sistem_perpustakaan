@@ -11,8 +11,6 @@
 {{-- ===================== NAVBAR ===================== --}}
 <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
     <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
-
-    {{-- Avatar: tampilkan foto jika ada, jika tidak tampilkan inisial nama --}}
     <a href="{{ route('kepala.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
         @if(Auth::user()->foto)
             <img src="{{ asset('storage/' . Auth::user()->foto) }}"
@@ -31,7 +29,6 @@
 <div class="flex flex-1">
 
     {{-- ===================== SIDEBAR ===================== --}}
-    {{-- Menu aktif ditandai warna lebih gelap (#831843) dan font-bold --}}
     <aside class="w-44 flex flex-col py-4 gap-2"
         style="background-color:#db2777; min-height: calc(100vh - 56px);">
 
@@ -41,7 +38,7 @@
             Dashboard
         </a>
 
-        {{-- Menu ini aktif karena kita sedang di halaman Edit Petugas --}}
+        {{-- Menu aktif karena sedang di halaman edit petugas --}}
         <a href="{{ route('kepala.petugas.index') }}"
             class="mx-3 px-4 py-2 rounded text-white text-sm text-center {{ request()->routeIs('kepala.petugas.*') ? 'font-bold' : '' }}"
             style="background-color: {{ request()->routeIs('kepala.petugas.*') ? '#831843' : '#9d174d' }};">
@@ -66,7 +63,6 @@
             Laporan
         </a>
 
-        {{-- Tombol logout di paling bawah sidebar --}}
         <div class="mt-auto mx-3 pb-4">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -81,19 +77,14 @@
     </aside>
 
     {{-- ===================== KONTEN UTAMA ===================== --}}
-    {{-- items-center justify-center supaya card selalu berada di tengah area konten --}}
     <main class="flex-1 flex flex-col items-center justify-center p-8">
-
-        {{-- Lebar card dibatasi max-w-lg, w-full agar tetap responsif --}}
         <div class="w-full max-w-lg">
 
-            {{-- Judul halaman --}}
             <h1 class="text-2xl font-bold text-gray-800 mb-6">Edit Petugas</h1>
 
-            {{-- Card form --}}
             <div class="bg-white rounded-xl shadow p-6">
 
-                {{-- Daftar error validasi dari server, muncul jika ada input yang tidak valid --}}
+                {{-- Pesan error validasi dari server --}}
                 @if($errors->any())
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
                     <ul class="list-disc list-inside">
@@ -104,22 +95,22 @@
                 </div>
                 @endif
 
-                {{-- FORM EDIT PETUGAS: kirim data ke PetugasController@update via PUT --}}
+                {{-- Form edit petugas, kirim data via PUT --}}
                 <form method="POST" action="{{ route('kepala.petugas.update', $petugas->id) }}">
                     @csrf
                     @method('PUT')
 
-                    {{-- Input nama lengkap, diisi otomatis dengan data petugas saat ini --}}
+                    {{-- Nama Lengkap --}}
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                        {{-- old() prioritaskan nilai lama jika validasi gagal, fallback ke data petugas --}}
+                        {{-- old() prioritaskan nilai lama jika validasi gagal --}}
                         <input type="text" name="name" value="{{ old('name', $petugas->name) }}"
                             placeholder="Masukkan nama petugas"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-200"
                             required>
                     </div>
 
-                    {{-- Input email, diisi otomatis dengan data petugas saat ini --}}
+                    {{-- Email --}}
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                         <input type="email" name="email" value="{{ old('email', $petugas->email) }}"
@@ -128,7 +119,15 @@
                             required>
                     </div>
 
-                    {{-- Input password baru: opsional, kosongkan jika tidak ingin mengubah --}}
+                    {{-- ✅ Username: dipakai petugas untuk login --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <input type="text" name="username" value="{{ old('username', $petugas->username) }}"
+                            placeholder="Masukkan username untuk login"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-200">
+                    </div>
+
+                    {{-- Password Baru (opsional, kosongkan jika tidak ingin diubah) --}}
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Password Baru
@@ -138,49 +137,65 @@
                             <input type="password" name="password" id="passwordInput"
                                 placeholder="Masukkan password baru..."
                                 class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-200">
-                            {{-- Tombol reset: isi otomatis password ke nilai default "12345678" --}}
+                            {{-- Tombol reset: isi otomatis password ke nilai default 12345678 --}}
                             <button type="button" onclick="resetPassword()"
                                 class="px-3 py-2 rounded-lg text-white text-xs font-medium"
                                 style="background-color:#db2777;">
                                 Reset Default
                             </button>
                         </div>
-                        {{-- Hint muncul 3 detik setelah klik Reset Default, lalu input kembali jadi password --}}
                         <p id="pwdHint" class="text-xs text-gray-400 mt-1 hidden">
                             Password direset ke: <strong>12345678</strong> — minta petugas ganti setelah login.
                         </p>
                     </div>
 
-                    {{-- Tombol simpan dan batal --}}
+                    {{-- Konfirmasi Password Baru --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Konfirmasi Password Baru
+                            <span class="text-gray-400 font-normal">(kosongkan jika tidak diubah)</span>
+                        </label>
+                        <input type="password" name="password_confirmation" id="passwordConfirmInput"
+                            placeholder="Ulangi password baru..."
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-200">
+                    </div>
+
+                    {{-- Tombol simpan & batal --}}
                     <div class="flex gap-3 mt-6">
                         <button type="submit" class="text-white px-5 py-2 rounded text-sm font-medium" style="background-color:#db2777;">
                             Simpan Perubahan
                         </button>
-                        {{-- Batal: kembali ke halaman daftar petugas tanpa menyimpan --}}
                         <a href="{{ route('kepala.petugas.index') }}" class="px-5 py-2 rounded text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200">
                             Batal
                         </a>
                     </div>
                 </form>
             </div>
-
         </div>
     </main>
 </div>
 
-{{-- JAVASCRIPT: isi input password dengan nilai default dan tampilkan hint sementara --}}
+{{-- ===================== JAVASCRIPT ===================== --}}
 <script>
+    // Reset password ke default 12345678 dan isi field konfirmasi sekaligus
     function resetPassword() {
-        const input = document.getElementById('passwordInput');
-        const hint  = document.getElementById('pwdHint');
+        const input        = document.getElementById('passwordInput');
+        const inputConfirm = document.getElementById('passwordConfirmInput');
+        const hint         = document.getElementById('pwdHint');
 
-        // Tampilkan password default sebentar, lalu sembunyikan lagi setelah 3 detik
-        input.value = '12345678';
-        input.type  = 'text';
+        // Isi kedua field dengan password default
+        input.value        = '12345678';
+        inputConfirm.value = '12345678';
+
+        // Tampilkan sementara agar user bisa lihat nilainya
+        input.type         = 'text';
+        inputConfirm.type  = 'text';
         hint.classList.remove('hidden');
 
+        // Sembunyikan lagi setelah 3 detik
         setTimeout(() => {
-            input.type = 'password';
+            input.type        = 'password';
+            inputConfirm.type = 'password';
         }, 3000);
     }
 </script>

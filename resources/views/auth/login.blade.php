@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login — Perpustakaan Digital</title>
+    <title>Login —Sistem Perpustakaan</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
@@ -11,7 +11,7 @@
 
     <!-- Navbar (sama seperti register) -->
     <nav style="padding:0 2rem;height:56px;display:flex;align-items:center;background-color:#db2777;position:relative;z-index:10;">
-        <span style="color:white;font-weight:700;font-size:1.125rem;font-style:italic;">Perpustakaan Digital</span>
+        <span style="color:white;font-weight:700;font-size:1.125rem;font-style:italic;">Sistem Perpustakaan</span>
     </nav>
 
     <!-- Main -->

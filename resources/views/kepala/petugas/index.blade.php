@@ -31,7 +31,6 @@
 <div class="flex flex-1">
 
     {{-- ===================== SIDEBAR ===================== --}}
-    {{-- Menu aktif ditandai warna lebih gelap (#831843) dan font-bold --}}
     <aside class="w-44 flex flex-col py-4 gap-2"
         style="background-color:#db2777; min-height: calc(100vh - 56px);">
 
@@ -41,7 +40,7 @@
             Dashboard
         </a>
 
-        {{-- Menu ini aktif karena kita sedang di halaman Data Petugas --}}
+        {{-- Menu aktif karena sedang di halaman Data Petugas --}}
         <a href="{{ route('kepala.petugas.index') }}"
             class="mx-3 px-4 py-2 rounded text-white text-sm text-center {{ request()->routeIs('kepala.petugas.*') ? 'font-bold' : '' }}"
             style="background-color: {{ request()->routeIs('kepala.petugas.*') ? '#831843' : '#9d174d' }};">
@@ -99,7 +98,7 @@
             </div>
         @endif
 
-        {{-- State kosong: tampil jika belum ada petugas sama sekali --}}
+        {{-- Tampilkan pesan kosong jika belum ada petugas --}}
         @if($petugas->isEmpty())
             <div class="flex flex-col items-center justify-center py-16 text-gray-400">
                 <span class="text-5xl mb-3">👤</span>
@@ -107,7 +106,7 @@
             </div>
         @else
 
-            {{-- SEARCH BAR: filter tabel nama & email secara live tanpa reload --}}
+            {{-- Search bar: filter tabel secara live tanpa reload halaman --}}
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 bg-white w-64">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,30 +125,33 @@
                         <tr style="background-color:#fce7f3;">
                             <th class="px-4 py-3 text-left font-semibold text-gray-700">No</th>
                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Nama</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Username</th>
                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Email</th>
                             <th class="px-4 py-3 text-center font-semibold text-gray-700">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
                         @foreach ($petugas as $index => $p)
-                        {{-- data-nama & data-email dipakai JS untuk mencocokkan keyword search --}}
+                        {{-- data-nama & data-email dipakai JS untuk filter pencarian --}}
                         <tr class="border-t border-gray-100 hover:bg-gray-50 transition"
                             data-nama="{{ strtolower($p->name) }}"
                             data-email="{{ strtolower($p->email) }}">
                             <td class="px-4 py-3 text-gray-500">{{ $index + 1 }}</td>
                             <td class="px-4 py-3 font-medium text-gray-800">{{ $p->name }}</td>
+                            {{-- ✅ Tampilkan username, kalau NULL tampilkan tanda strip --}}
+                            <td class="px-4 py-3 text-gray-600">{{ $p->username ?? '-' }}</td>
                             <td class="px-4 py-3 text-gray-600">{{ $p->email }}</td>
                             <td class="px-4 py-3">
                                 <div class="flex items-center justify-center gap-2">
 
-                                    {{-- Tombol Edit: mengarah ke halaman form edit petugas --}}
+                                    {{-- Tombol Edit --}}
                                     <a href="{{ route('kepala.petugas.edit', $p->id) }}"
                                         class="text-xs px-3 py-1 rounded font-medium"
                                         style="background:#fce7f3; color:#9d174d; border: 1px solid #f9a8d4;">
                                         ✏️ Edit
                                     </a>
 
-                                    {{-- Tombol Hapus: minta konfirmasi sebelum submit form DELETE --}}
+                                    {{-- Tombol Hapus dengan konfirmasi --}}
                                     <form action="{{ route('kepala.petugas.destroy', $p->id) }}" method="POST"
                                         onsubmit="return confirm('Yakin hapus petugas ini?')">
                                         @csrf
@@ -167,7 +169,7 @@
                     </tbody>
                 </table>
 
-                {{-- Pesan ini muncul ketika hasil search tidak ditemukan --}}
+                {{-- Pesan muncul ketika hasil search tidak ditemukan --}}
                 <div id="emptySearch" class="hidden text-center py-10 text-gray-400 text-sm">
                     Tidak ada petugas yang cocok dengan pencarian.
                 </div>
@@ -178,7 +180,7 @@
 </div>
 
 {{-- ===================== JAVASCRIPT: LIVE SEARCH ===================== --}}
-{{-- Filter baris tabel secara client-side, cocokkan keyword dengan nama atau email --}}
+{{-- Filter baris tabel secara client-side berdasarkan nama atau email --}}
 <script>
     function filterTable() {
         const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -187,13 +189,11 @@
         let visible   = 0;
 
         rows.forEach(row => {
-            // Cek apakah keyword cocok dengan nama atau email di data-attribute baris
             const match = row.dataset.nama.includes(keyword) || row.dataset.email.includes(keyword);
             row.style.display = match ? '' : 'none';
             if (match) visible++;
         });
 
-        // Tampilkan pesan kosong jika tidak ada baris yang cocok
         empty.classList.toggle('hidden', visible > 0);
     }
 </script>

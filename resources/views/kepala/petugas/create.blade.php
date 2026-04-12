@@ -11,8 +11,6 @@
 {{-- ===================== NAVBAR ===================== --}}
 <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
     <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
-
-    {{-- Avatar: tampilkan foto jika ada, jika tidak tampilkan inisial nama --}}
     <a href="{{ route('kepala.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
         @if(Auth::user()->foto)
             <img src="{{ asset('storage/' . Auth::user()->foto) }}"
@@ -31,7 +29,6 @@
 <div class="flex flex-1">
 
     {{-- ===================== SIDEBAR ===================== --}}
-    {{-- Menu aktif ditandai warna lebih gelap (#831843) dan font-bold --}}
     <aside class="w-44 flex flex-col py-4 gap-2"
         style="background-color:#db2777; min-height: calc(100vh - 56px);">
 
@@ -47,7 +44,6 @@
             Katalog Buku
         </a>
 
-        {{-- Menu ini aktif karena kita sedang di halaman Tambah Petugas --}}
         <a href="{{ route('kepala.petugas.index') }}"
             class="mx-3 px-4 py-2 rounded text-white text-sm text-center {{ request()->routeIs('kepala.petugas.*') ? 'font-bold' : '' }}"
             style="background-color: {{ request()->routeIs('kepala.petugas.*') ? '#831843' : '#9d174d' }};">
@@ -66,7 +62,6 @@
             Laporan
         </a>
 
-        {{-- Tombol logout di paling bawah sidebar --}}
         <div class="mt-auto mx-3 pb-4">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -81,21 +76,16 @@
     </aside>
 
     {{-- ===================== KONTEN UTAMA ===================== --}}
-    {{-- items-center justify-center supaya card selalu berada di tengah area konten --}}
     <main class="flex-1 flex flex-col items-center justify-center p-8">
-
-        {{-- Lebar card dibatasi max-w-lg, w-full agar tetap responsif --}}
         <div class="w-full max-w-lg">
 
-            {{-- judul halaman --}}
             <div class="flex items-center gap-2 mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Tambah Petugas</h1>
             </div>
 
-            {{-- Card form --}}
             <div class="bg-white rounded-xl shadow p-6">
 
-                {{-- Daftar error validasi dari server, muncul jika ada input yang tidak valid --}}
+                {{-- Pesan error validasi --}}
                 @if($errors->any())
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
                     <ul class="list-disc list-inside">
@@ -106,20 +96,18 @@
                 </div>
                 @endif
 
-                {{-- FORM TAMBAH PETUGAS: kirim data ke PetugasController@store via POST --}}
                 <form method="POST" action="{{ route('kepala.petugas.store') }}">
                     @csrf
 
-                    {{-- Input nama lengkap petugas --}}
+                    {{-- Nama Lengkap --}}
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                        {{-- old('name') menjaga nilai input tetap ada jika validasi gagal --}}
                         <input type="text" name="name" value="{{ old('name') }}"
                             placeholder="Masukkan nama petugas"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-200 @error('name') border-red-400 @enderror">
                     </div>
 
-                    {{-- Input email petugas --}}
+                    {{-- Email --}}
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                         <input type="email" name="email" value="{{ old('email') }}"
@@ -127,7 +115,15 @@
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-200 @error('email') border-red-400 @enderror">
                     </div>
 
-                    {{-- Input password, minimal 8 karakter --}}
+                    {{-- ✅ Username (untuk login) --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <input type="text" name="username" value="{{ old('username') }}"
+                            placeholder="Masukkan username untuk login"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-200 @error('username') border-red-400 @enderror">
+                    </div>
+
+                    {{-- Password --}}
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                         <input type="password" name="password"
@@ -135,7 +131,7 @@
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-200 @error('password') border-red-400 @enderror">
                     </div>
 
-                    {{-- Input konfirmasi password, harus sama dengan password di atas --}}
+                    {{-- Konfirmasi Password --}}
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
                         <input type="password" name="password_confirmation"
@@ -143,19 +139,17 @@
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-200">
                     </div>
 
-                    {{-- Tombol simpan dan batal --}}
+                    {{-- Tombol simpan & batal --}}
                     <div class="flex gap-3">
                         <button type="submit" class="text-white px-5 py-2 rounded text-sm font-medium" style="background-color:#db2777;">
                             Simpan Petugas
                         </button>
-                        {{-- Batal: kembali ke halaman daftar petugas tanpa menyimpan --}}
                         <a href="{{ route('kepala.petugas.index') }}" class="px-5 py-2 rounded text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200">
                             Batal
                         </a>
                     </div>
                 </form>
             </div>
-
         </div>
     </main>
 </div>

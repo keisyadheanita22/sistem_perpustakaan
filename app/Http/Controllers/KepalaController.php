@@ -26,7 +26,7 @@ class KepalaController extends Controller
         $totalPetugas    = User::where('role', 'petugas')->count();
         $peminjamanAktif = Peminjaman::where('status', 'dipinjam')->count();
 
-        // ambil 5 buku terbaru
+        // Ambil 5 buku terbaru
         $buku = Buku::latest()->take(5)->get();
 
         return view('dashboard.kepala', compact(
@@ -127,6 +127,8 @@ class KepalaController extends Controller
     // =====================
     // DATA PETUGAS
     // =====================
+
+    // Tampilkan daftar semua petugas
     public function indexPetugas(Request $request)
     {
         $petugas = User::where('role', 'petugas')
@@ -140,22 +142,27 @@ class KepalaController extends Controller
         return view('kepala.petugas.index', compact('petugas'));
     }
 
+    // Tampilkan form tambah petugas
     public function createPetugas()
     {
         return view('kepala.petugas.create');
     }
 
+    // Simpan data petugas baru ke database
     public function storePetugas(Request $request)
     {
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
+            'username' => 'required|string|max:50|unique:users,username', // ✅ validasi username
             'password' => 'required|min:8|confirmed',
         ]);
 
+        // ✅ Simpan username agar petugas bisa login pakai username
         User::create([
             'name'     => $request->name,
             'email'    => $request->email,
+            'username' => $request->username,
             'password' => bcrypt($request->password),
             'role'     => 'petugas',
         ]);
@@ -164,12 +171,14 @@ class KepalaController extends Controller
                          ->with('success', 'Petugas berhasil ditambahkan!');
     }
 
+    // Tampilkan form edit petugas
     public function editPetugas($id)
     {
         $petugas = User::where('role', 'petugas')->findOrFail($id);
         return view('kepala.petugas.edit', compact('petugas'));
     }
 
+    // Simpan perubahan data petugas
     public function updatePetugas(Request $request, $id)
     {
         $petugas = User::where('role', 'petugas')->findOrFail($id);
@@ -177,12 +186,15 @@ class KepalaController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email,' . $id,
+             'username' => 'nullable|string|max:50|unique:users,username,' . $id,
             'password' => 'nullable|min:6|confirmed',
         ]);
 
         $petugas->update([
             'name'  => $request->name,
             'email' => $request->email,
+            'username' => $request->username,
+            // ✅ Update password hanya kalau diisi
             ...($request->filled('password')
                 ? ['password' => bcrypt($request->password)]
                 : []),
@@ -192,6 +204,7 @@ class KepalaController extends Controller
                          ->with('success', 'Data petugas berhasil diperbarui!');
     }
 
+    // Hapus data petugas
     public function destroyPetugas($id)
     {
         $petugas = User::where('role', 'petugas')->findOrFail($id);

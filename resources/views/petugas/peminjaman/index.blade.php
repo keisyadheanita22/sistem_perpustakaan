@@ -105,8 +105,7 @@
                         <th class="px-4 py-3 text-left">Buku</th>
                         <th class="px-4 py-3 text-left">Tanggal Pinjam</th>
                         <th class="px-4 py-3 text-left">Batas Kembali</th>
-                        {{-- ✅ Kolom baru: Tgl Kembali aktual (diisi otomatis saat status dikembalikan) --}}
-                        <th class="px-4 py-3 text-left">Tgl Kembali</th>
+                        <th class="px-4 py-3 text-left">Tanggal Kembali</th>
                         <th class="px-4 py-3 text-left">Status</th>
                         <th class="px-4 py-3 text-left">Aksi</th>
                     </tr>

@@ -3,33 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\Peminjaman;
-use App\Models\Anggota;
+use App\Models\User;   // ✅ Ganti Anggota -> User
 use App\Models\Buku;
 use Illuminate\Http\Request;
 
 class PeminjamanController extends Controller
 {
     // ===== PETUGAS: Tampilkan semua data peminjaman =====
-   public function index()
-{
-    $search = request('search');
+    public function index()
+    {
+        $search = request('search');
 
-    $peminjamans = Peminjaman::with('buku')
-        ->when($search, function($query) use ($search) {
-            $query->where('nama_anggota', 'like', '%' . $search . '%');
-        })->get();
+        $peminjamans = Peminjaman::with('buku')
+            ->when($search, function ($query) use ($search) {
+                $query->where('nama_anggota', 'like', '%' . $search . '%');
+            })->get();
 
-    // Hitung yang perlu diverifikasi
-    $perluVerifikasi = Peminjaman::whereIn('status', ['menunggu', 'mengembalikan'])->count();
+        // Hitung peminjaman yang perlu diverifikasi petugas
+        $perluVerifikasi = Peminjaman::whereIn('status', ['menunggu', 'mengembalikan'])->count();
 
-    return view('petugas.peminjaman.index', compact('peminjamans', 'perluVerifikasi'));
-}
+        return view('petugas.peminjaman.index', compact('peminjamans', 'perluVerifikasi'));
+    }
 
     // ===== PETUGAS: Halaman form tambah peminjaman =====
     public function create()
     {
+        // ✅ Ambil hanya user dengan role anggota (bukan dari tabel anggotas)
+        $anggota = User::where('role', 'anggota')->get();
+
         // Hanya tampilkan buku yang stoknya masih ada
-        $anggota = Anggota::all();
         $bukus = Buku::where('stok', '>', 0)->get();
 
         return view('petugas.peminjaman.create', compact('anggota', 'bukus'));
@@ -45,21 +47,22 @@ class PeminjamanController extends Controller
             'tanggal_kembali' => 'required|date',
         ]);
 
-        $anggota = Anggota::findOrFail($request->anggota_id);
+        // ✅ Cari anggota dari tabel users (bukan anggotas)
+        $anggota = User::findOrFail($request->anggota_id);
 
         // Generate ID peminjaman otomatis: PM001, PM002, dst
-        $last = Peminjaman::orderBy('id', 'desc')->first();
-        $newNumber = $last ? (int)substr($last->id_peminjaman, 2) + 1 : 1;
+        $last         = Peminjaman::orderBy('id', 'desc')->first();
+        $newNumber    = $last ? (int) substr($last->id_peminjaman, 2) + 1 : 1;
         $idPeminjaman = 'PM' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
 
         Peminjaman::create([
             'id_peminjaman'   => $idPeminjaman,
             'id_anggota'      => $anggota->id_anggota,
-            'nama_anggota'    => $anggota->nama,
+            'nama_anggota'    => $anggota->name,   // ✅ users pakai 'name' bukan 'nama'
             'buku_id'         => $request->buku_id,
             'tanggal_pinjam'  => $request->tanggal_pinjam,
             'tanggal_kembali' => $request->tanggal_kembali,
-            'status'          => 'dipinjam', // Petugas input langsung = langsung dipinjam (tidak perlu verifikasi)
+            'status'          => 'dipinjam', // Petugas input langsung = langsung dipinjam
         ]);
 
         // Kurangi stok buku karena langsung dipinjam
@@ -77,8 +80,8 @@ class PeminjamanController extends Controller
         $user = auth()->user();
 
         // Generate ID peminjaman otomatis: PM001, PM002, dst
-        $last = Peminjaman::orderBy('id', 'desc')->first();
-        $newNumber = $last ? (int)substr($last->id_peminjaman, 2) + 1 : 1;
+        $last         = Peminjaman::orderBy('id', 'desc')->first();
+        $newNumber    = $last ? (int) substr($last->id_peminjaman, 2) + 1 : 1;
         $idPeminjaman = 'PM' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
 
         Peminjaman::create([
@@ -88,9 +91,9 @@ class PeminjamanController extends Controller
             'buku_id'         => $buku->id,
             'tanggal_pinjam'  => now(),
             'tanggal_kembali' => now()->addDays(7), // Batas kembali otomatis 7 hari
-            'status'          => 'menunggu', // Anggota pinjam = menunggu, harus diverifikasi petugas dulu
+            'status'          => 'menunggu', // Anggota pinjam = menunggu verifikasi petugas
         ]);
-        // Catatan: stok belum dikurangi di sini, dikurangi nanti saat petugas verifikasi
+        // Catatan: stok belum dikurangi, dikurangi nanti saat petugas verifikasi
 
         return redirect()->route('katalog.index')
             ->with('success', 'Permintaan peminjaman berhasil dikirim, tunggu verifikasi petugas!');
@@ -101,8 +104,7 @@ class PeminjamanController extends Controller
     {
         $user = auth()->user();
 
-        // Ambil semua riwayat peminjaman milik anggota yang sedang login
-        // Diurutkan dari yang terbaru
+        // Ambil semua riwayat peminjaman milik anggota yang sedang login, diurutkan terbaru
         $peminjamans = Peminjaman::with('buku')
             ->where('nama_anggota', $user->name)
             ->latest()
@@ -152,7 +154,7 @@ class PeminjamanController extends Controller
     public function verifikasi($id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
-        $buku = Buku::findOrFail($peminjaman->buku_id);
+        $buku       = Buku::findOrFail($peminjaman->buku_id);
 
         // Ubah status jadi 'dipinjam'
         $peminjaman->update(['status' => 'dipinjam']);
@@ -187,17 +189,24 @@ class PeminjamanController extends Controller
     }
 
     // ===== PETUGAS: Halaman form edit peminjaman =====
-    public function edit(Peminjaman $peminjaman)
+    public function edit($id) // ✅ pakai $id bukan route model binding
     {
-        $anggota = Anggota::all();
-        $bukus = Buku::all();
+        // Cari peminjaman berdasarkan id, otomatis 404 kalau tidak ketemu
+        $peminjaman = Peminjaman::findOrFail($id);
+
+        // Ambil hanya user dengan role anggota
+        $anggota = User::where('role', 'anggota')->get();
+        $bukus   = Buku::all();
 
         return view('petugas.peminjaman.edit', compact('peminjaman', 'anggota', 'bukus'));
     }
 
     // ===== PETUGAS: Simpan perubahan data peminjaman =====
-    public function update(Request $request, Peminjaman $peminjaman)
+    public function update(Request $request, $id) // ✅ pakai $id bukan route model binding
     {
+        // Cari peminjaman berdasarkan id, otomatis 404 kalau tidak ketemu
+        $peminjaman = Peminjaman::findOrFail($id);
+
         $request->validate([
             'tanggal_kembali' => 'required|date',
             'status'          => 'required',
@@ -210,8 +219,11 @@ class PeminjamanController extends Controller
     }
 
     // ===== PETUGAS: Hapus data peminjaman =====
-    public function destroy(Peminjaman $peminjaman)
+    public function destroy($id) // ✅ pakai $id bukan route model binding
     {
+        // Cari peminjaman berdasarkan id, otomatis 404 kalau tidak ketemu
+        $peminjaman = Peminjaman::findOrFail($id);
+
         $peminjaman->delete();
 
         return redirect()->route('peminjaman.index')

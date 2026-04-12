@@ -21,24 +21,49 @@ Route::get('/', function () {
 });
 
 // =============================================================
-// SEMUA ROUTE YANG BUTUH LOGIN (AUTH)
+// ROUTE KHUSUS ANGGOTA
 // =============================================================
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:anggota'])->group(function () {
 
-    // ---------------------------------------------------------
-    // DASHBOARD PER ROLE
-    // ---------------------------------------------------------
+    // Dashboard Anggota
     Route::get('/dashboard/anggota', function () {
         return view('dashboard.anggota');
     })->name('anggota.dashboard');
 
+    // Katalog Buku
+    Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');
+
+    // Profil Anggota
+    Route::get('/profil', [ProfilAnggotaController::class, 'show'])->name('anggota.profil');
+    Route::put('/profil/update', [ProfilAnggotaController::class, 'update'])->name('anggota.profil.update');
+    Route::put('/profil/password', [ProfilAnggotaController::class, 'gantiPassword'])->name('anggota.profil.password');
+
+    // Peminjaman Anggota
+    Route::get('/peminjaman/saya', [PeminjamanController::class, 'peminjamanSaya'])->name('peminjaman.saya');
+    Route::post('/peminjaman/pinjam/{buku}', [PeminjamanController::class, 'pinjam'])->name('peminjaman.pinjam');
+    Route::post('/peminjaman/{id}/kembalikan', [PeminjamanController::class, 'kembalikan'])->name('peminjaman.kembalikan');
+    Route::post('/peminjaman/{id}/batalkan', [PeminjamanController::class, 'batalkan'])->name('peminjaman.batalkan');
+
+    // Denda Anggota
+    Route::get('/denda/saya', [DendaController::class, 'dendaSaya'])->name('denda.saya');
+});
+
+// =============================================================
+// ROUTE KHUSUS PETUGAS
+// =============================================================
+Route::middleware(['auth', 'role:petugas'])->group(function () {
+
+    // Dashboard Petugas
     Route::get('/dashboard/petugas', function () {
         return view('dashboard.petugas');
     })->name('petugas.dashboard');
 
-    // ---------------------------------------------------------
-    // ROUTE BUKU - PETUGAS
-    // ---------------------------------------------------------
+    // Profil Petugas
+    Route::get('/petugas/profil', [ProfilPetugasController::class, 'show'])->name('petugas.profil');
+    Route::put('/petugas/profil/update', [ProfilPetugasController::class, 'update'])->name('petugas.profil.update');
+    Route::put('/petugas/profil/password', [ProfilPetugasController::class, 'gantiPassword'])->name('petugas.profil.password');
+
+    // Kelola Buku
     Route::get('/buku', [BukuController::class, 'index'])->name('buku.index');
     Route::get('/buku/create', [BukuController::class, 'create'])->name('buku.create');
     Route::post('/buku', [BukuController::class, 'store'])->name('buku.store');
@@ -47,9 +72,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/buku/{buku}', [BukuController::class, 'update'])->name('buku.update');
     Route::delete('/buku/{buku}', [BukuController::class, 'destroy'])->name('buku.destroy');
 
-    // ---------------------------------------------------------
-    // ROUTE KATEGORI - PETUGAS
-    // ---------------------------------------------------------
+    // Kelola Kategori
     Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
     Route::get('/kategori/create', [KategoriController::class, 'create'])->name('kategori.create');
     Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
@@ -58,33 +81,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/kategori/{kategori}', [KategoriController::class, 'update'])->name('kategori.update');
     Route::delete('/kategori/{kategori}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 
-    // ---------------------------------------------------------
-    // ROUTE KATALOG - ANGGOTA
-    // ---------------------------------------------------------
-    Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog.index');
-
-    // ---------------------------------------------------------
-    // ROUTE PROFIL ANGGOTA & PETUGAS
-    // ---------------------------------------------------------
-    Route::get('/profil', [ProfilAnggotaController::class, 'show'])->name('anggota.profil');
-    Route::put('/profil/update', [ProfilAnggotaController::class, 'update'])->name('anggota.profil.update');
-    Route::put('/profil/password', [ProfilAnggotaController::class, 'gantiPassword'])->name('anggota.profil.password');
-
-    Route::get('/petugas/profil', [ProfilPetugasController::class, 'show'])->name('petugas.profil');
-    Route::put('/petugas/profil/update', [ProfilPetugasController::class, 'update'])->name('petugas.profil.update');
-    Route::put('/petugas/profil/password', [ProfilPetugasController::class, 'gantiPassword'])->name('petugas.profil.password');
-
-    // ---------------------------------------------------------
-    // ROUTE PEMINJAMAN - ANGGOTA
-    // ---------------------------------------------------------
-    Route::get('/peminjaman/saya', [PeminjamanController::class, 'peminjamanSaya'])->name('peminjaman.saya');
-    Route::post('/peminjaman/pinjam/{buku}', [PeminjamanController::class, 'pinjam'])->name('peminjaman.pinjam')->middleware('role:anggota');
-    Route::post('/peminjaman/{id}/kembalikan', [PeminjamanController::class, 'kembalikan'])->name('peminjaman.kembalikan')->middleware('role:anggota');
-    Route::post('/peminjaman/{id}/batalkan', [PeminjamanController::class, 'batalkan'])->name('peminjaman.batalkan')->middleware('role:anggota');
-
-    // ---------------------------------------------------------
-    // ROUTE PEMINJAMAN - PETUGAS
-    // ---------------------------------------------------------
+    // Kelola Peminjaman
     Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get('/peminjaman/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
     Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');
@@ -92,25 +89,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/peminjaman/{id}/edit', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
     Route::put('/peminjaman/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
     Route::delete('/peminjaman/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
+    Route::post('/peminjaman/{id}/verifikasi', [PeminjamanController::class, 'verifikasi'])->name('peminjaman.verifikasi');
+    Route::post('/peminjaman/{id}/verifikasi-kembali', [PeminjamanController::class, 'verifikasiKembali'])->name('peminjaman.verifikasiKembali');
 
-    Route::post('/peminjaman/{id}/verifikasi', [PeminjamanController::class, 'verifikasi'])->name('peminjaman.verifikasi')->middleware('role:petugas');
-    Route::post('/peminjaman/{id}/verifikasi-kembali', [PeminjamanController::class, 'verifikasiKembali'])->name('peminjaman.verifikasiKembali')->middleware('role:petugas');
+    // Kelola Anggota
+    Route::get('/anggota', [AnggotaController::class, 'index'])->name('anggota.index');
+    Route::get('/anggota/{id}/edit', [AnggotaController::class, 'edit'])->name('anggota.edit');
+    Route::put('/anggota/{id}', [AnggotaController::class, 'update'])->name('anggota.update');
+    Route::delete('/anggota/{id}', [AnggotaController::class, 'destroy'])->name('anggota.destroy');
 
-    // ---------------------------------------------------------
-    // ROUTE KELOLA ANGGOTA - PETUGAS
-    // ---------------------------------------------------------
-    Route::get('/anggota', [AnggotaController::class, 'index'])->middleware('role:petugas')->name('anggota.index');
-    Route::get('/anggota/{id}/edit', [AnggotaController::class, 'edit'])->middleware('role:petugas')->name('anggota.edit');     // ← BARU
-    Route::put('/anggota/{id}', [AnggotaController::class, 'update'])->middleware('role:petugas')->name('anggota.update');      // ← BARU
-    Route::delete('/anggota/{id}', [AnggotaController::class, 'destroy'])->middleware('role:petugas')->name('anggota.destroy');
-
-    // ---------------------------------------------------------
-    // ROUTE DENDA
-    // ---------------------------------------------------------
-    Route::get('/denda/saya', [DendaController::class, 'dendaSaya'])->name('denda.saya');
+    // Denda Petugas
+    Route::get('/denda', [DendaController::class, 'index'])->name('denda.index');
     Route::get('/denda/pengaturan', [DendaController::class, 'pengaturan'])->name('denda.pengaturan');
     Route::post('/denda/pengaturan', [DendaController::class, 'updatePengaturan'])->name('denda.updatePengaturan');
-    Route::get('/denda', [DendaController::class, 'index'])->name('denda.index');
     Route::post('/denda/{id}/konfirmasi', [DendaController::class, 'konfirmasi'])->name('denda.konfirmasi');
 });
 
@@ -140,10 +131,10 @@ Route::middleware(['auth', 'role:kepala'])->prefix('kepala')->name('kepala.')->g
     Route::put('/petugas/{id}', [KepalaController::class, 'updatePetugas'])->name('petugas.update');
     Route::delete('/petugas/{id}', [KepalaController::class, 'destroyPetugas'])->name('petugas.destroy');
 
-    // Kelola Anggota (pakai indexKepala agar view kepala yang dipakai)
+    // Kelola Anggota
     Route::get('/anggota', [AnggotaController::class, 'indexKepala'])->name('anggota.index');
-    Route::get('/anggota/{id}/edit', [AnggotaController::class, 'editKepala'])->name('anggota.edit');   // ← BARU
-    Route::put('/anggota/{id}', [AnggotaController::class, 'updateKepala'])->name('anggota.update');    // ← BARU
+    Route::get('/anggota/{id}/edit', [AnggotaController::class, 'editKepala'])->name('anggota.edit');
+    Route::put('/anggota/{id}', [AnggotaController::class, 'updateKepala'])->name('anggota.update');
 });
 
 // =============================================================

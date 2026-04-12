@@ -12,14 +12,10 @@
 {{-- ===== NAVBAR ===== --}}
 <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
     <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
-
-    {{-- Link ke profil petugas --}}
     <a href="{{ route('petugas.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
-        {{-- Kalau user punya foto, tampilkan fotonya --}}
         @if(Auth::user()->foto)
             <img src="{{ asset('storage/' . Auth::user()->foto) }}" class="w-8 h-8 rounded-full object-cover">
         @else
-            {{-- Kalau tidak ada foto, tampilkan inisial huruf pertama nama --}}
             <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style="background-color:#9d174d;">
                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
             </div>
@@ -36,18 +32,14 @@
         <a href="{{ route('buku.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Buku</a>
         <a href="{{ route('anggota.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Anggota</a>
 
-        {{-- Menu aktif (Peminjaman) diberi warna lebih gelap --}}
-        {{-- Ditambah badge notifikasi kalau ada yang perlu diverifikasi --}}
+        {{-- Menu aktif Peminjaman dengan badge notifikasi --}}
         <a href="{{ route('peminjaman.index') }}"
            class="mx-3 px-4 py-2 rounded text-white text-sm text-center font-bold flex items-center justify-center gap-2"
            style="background-color:#831843;">
             Peminjaman
-
-            {{-- Badge angka hanya muncul kalau ada status 'menunggu' atau 'mengembalikan' --}}
             @if(!empty($perluVerifikasi) && $perluVerifikasi > 0)
                 <span style="background-color:white; color:#db2777;"
                       class="text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center leading-none">
-                    {{-- Kalau lebih dari 9, tampilkan '9+' supaya badge tidak melar --}}
                     {{ $perluVerifikasi > 9 ? '9+' : $perluVerifikasi }}
                 </span>
             @endif
@@ -56,7 +48,6 @@
         <a href="{{ route('kategori.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Kategori</a>
         <a href="{{ route('denda.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Denda</a>
 
-        {{-- Tombol logout di bagian bawah sidebar --}}
         <div class="mt-auto mx-3 pb-4">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -76,14 +67,14 @@
             <h1 class="text-2xl font-bold text-gray-800">Peminjaman</h1>
         </div>
 
-        {{-- Notifikasi sukses (muncul setelah aksi berhasil) --}}
+        {{-- Notifikasi sukses --}}
         @if(session('success'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-sm">
             {{ session('success') }}
         </div>
         @endif
 
-        {{-- Notifikasi error (muncul kalau ada kesalahan) --}}
+        {{-- Notifikasi error --}}
         @if(session('error'))
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
             {{ session('error') }}
@@ -114,12 +105,13 @@
                         <th class="px-4 py-3 text-left">Buku</th>
                         <th class="px-4 py-3 text-left">Tanggal Pinjam</th>
                         <th class="px-4 py-3 text-left">Batas Kembali</th>
+                        {{-- ✅ Kolom baru: Tgl Kembali aktual (diisi otomatis saat status dikembalikan) --}}
+                        <th class="px-4 py-3 text-left">Tgl Kembali</th>
                         <th class="px-4 py-3 text-left">Status</th>
                         <th class="px-4 py-3 text-left">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- Loop semua data peminjaman --}}
                     @forelse ($peminjamans as $item)
                     <tr class="border-b hover:bg-pink-50 transition">
                         <td class="px-4 py-4">{{ $loop->iteration }}</td>
@@ -129,31 +121,29 @@
                         <td class="px-4 py-4">{{ $item->tanggal_pinjam }}</td>
                         <td class="px-4 py-4">{{ $item->tanggal_kembali }}</td>
 
-                        {{-- Kolom status dengan badge warna berbeda tiap status --}}
+                        {{-- ✅ Tgl Kembali aktual: tampil updated_at kalau sudah dikembalikan, selain itu tampil '-' --}}
+                        <td class="px-4 py-4">
+                            @if($item->status == 'dikembalikan')
+                                {{ \Carbon\Carbon::parse($item->updated_at)->format('Y-m-d') }}
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+
+                        {{-- Kolom status dengan badge warna --}}
                         <td class="px-4 py-4">
                             @if($item->status == 'menunggu')
-                                {{-- Status menunggu = kuning, artinya belum diverifikasi --}}
                                 <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#d97706;">Menunggu</span>
                             @elseif($item->status == 'dipinjam')
-                                {{-- Status dipinjam = merah, artinya sudah diverifikasi & sedang dipinjam --}}
                                 <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#dc2626;">Dipinjam</span>
                             @elseif($item->status == 'mengembalikan')
-                                {{-- Status mengembalikan = ungu, artinya anggota minta kembalikan buku --}}
                                 <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#7c3aed;">Minta Kembali</span>
                             @else
-                                {{-- Status dikembalikan = hijau, proses selesai --}}
                                 <span class="px-2 py-1 rounded-full text-xs font-medium text-white" style="background-color:#16a34a;">Dikembalikan</span>
                             @endif
                         </td>
 
                         {{-- ===== KOLOM AKSI ===== --}}
-                        {{--
-                            LOGIKA TOMBOL AKSI:
-                            - Status 'menunggu'      → hanya tampil tombol "Verifikasi Pinjam"
-                            - Status 'mengembalikan' → hanya tampil tombol "Verifikasi Kembali"
-                            - Status lainnya (dipinjam/dikembalikan) → tampil tombol Edit & Hapus
-                            Tujuan: Edit & Hapus hanya bisa diakses setelah diverifikasi
-                        --}}
                         <td class="px-4 py-4">
                             <div class="flex items-center gap-3 flex-wrap">
 
@@ -173,10 +163,7 @@
                                 </form>
                                 @endif
 
-                                {{--
-                                    Tombol Edit & Hapus hanya muncul kalau status BUKAN 'menunggu' dan BUKAN 'mengembalikan'
-                                    (artinya: sudah melewati proses verifikasi)
-                                --}}
+                                {{-- Tombol Edit & Hapus hanya muncul kalau sudah melewati verifikasi --}}
                                 @if($item->status != 'menunggu' && $item->status != 'mengembalikan')
                                 <a href="{{ route('peminjaman.edit', $item->id) }}" class="text-yellow-500 hover:text-yellow-600 font-medium text-xs">✏️ Edit</a>
                                 <span class="text-gray-300">|</span>
@@ -191,10 +178,9 @@
                         </td>
                     </tr>
 
-                    {{-- Kalau tidak ada data peminjaman sama sekali --}}
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center py-8 text-gray-400">
+                        <td colspan="9" class="text-center py-8 text-gray-400">
                             <div class="flex flex-col items-center gap-2">
                                 <span class="text-4xl">📖</span>
                                 <span>Tidak ada data peminjaman.</span>

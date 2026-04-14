@@ -82,41 +82,41 @@
             </div>
 
             {{-- Stat Cards --}}
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
-                <div style="background: #FFFDF8; border-radius: 14px; padding: 20px 22px; border: 1px solid #E8E2D4; display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: #E8F0DC;">📚</div>
-                    <div>
-                        <p style="margin: 0; font-size: 11px; color: #8A7E6E;">Total Buku</p>
-                        <p style="margin: 0; font-size: 24px; font-weight: 700; color: #2D3A1E;">{{ \App\Models\Buku::count() }}</p>
-                    </div>
-                </div>
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+    <div style="background: #2D5A1E; border-radius: 14px; padding: 20px 22px; border: 1px solid #1E3D12; display: flex; align-items: center; gap: 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: rgba(255,255,255,0.15);">📚</div>
+        <div>
+            <p style="margin: 0; font-size: 11px; color: #A8D88A;">Total Buku</p>
+            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #FFFFFF;">{{ \App\Models\Buku::count() }}</p>
+        </div>
+    </div>
 
-                <div style="background: #FFFDF8; border-radius: 14px; padding: 20px 22px; border: 1px solid #E8E2D4; display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: #DDE8F5;">👤</div>
-                    <div>
-                        <p style="margin: 0; font-size: 11px; color: #8A7E6E;">Total Anggota</p>
-                        <p style="margin: 0; font-size: 24px; font-weight: 700; color: #2D3A1E;">{{ \App\Models\User::where('role', 'anggota')->count() }}</p>
-                    </div>
-                </div>
+    <div style="background: #1A3A5C; border-radius: 14px; padding: 20px 22px; border: 1px solid #102840; display: flex; align-items: center; gap: 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: rgba(255,255,255,0.15);">👤</div>
+        <div>
+            <p style="margin: 0; font-size: 11px; color: #90BEE8;">Total Anggota</p>
+            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #FFFFFF;">{{ \App\Models\User::where('role', 'anggota')->count() }}</p>
+        </div>
+    </div>
 
-                <div style="background: #FFFDF8; border-radius: 14px; padding: 20px 22px; border: 1px solid #E8E2D4; display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: #F5E8CC;">🛡️</div>
-                    <div>
-                        <p style="margin: 0; font-size: 11px; color: #8A7E6E;">Total Petugas</p>
-                        <p style="margin: 0; font-size: 24px; font-weight: 700; color: #2D3A1E;">{{ \App\Models\User::where('role', 'petugas')->count() }}</p>
-                    </div>
-                </div>
+    <div style="background: #7A5800; border-radius: 14px; padding: 20px 22px; border: 1px solid #5A4000; display: flex; align-items: center; gap: 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: rgba(255,255,255,0.15);">🛡️</div>
+        <div>
+            <p style="margin: 0; font-size: 11px; color: #F0C84A;">Total Petugas</p>
+            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #FFFFFF;">{{ \App\Models\User::where('role', 'petugas')->count() }}</p>
+        </div>
+    </div>
 
-                <div style="background: #FFFDF8; border-radius: 14px; padding: 20px 22px; border: 1px solid #E8E2D4; display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: #E8E2D4;">📖</div>
-                    <div>
-                        <p style="margin: 0; font-size: 11px; color: #8A7E6E;">Pinjaman Aktif</p>
-                        <p style="margin: 0; font-size: 24px; font-weight: 700; color: #2D3A1E;">{{ \App\Models\Peminjaman::where('status', 'dipinjam')->count() }}</p>
-                    </div>
-                </div>
-            </div>
-
+    <div style="background: #1E3D2F; border-radius: 14px; padding: 20px 22px; border: 1px solid #122618; display: flex; align-items: center; gap: 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: rgba(255,255,255,0.15);">📖</div>
+        <div>
+            <p style="margin: 0; font-size: 11px; color: #80C4A0;">Pinjaman Aktif</p>
+            <p style="margin: 0; font-size: 24px; font-weight: 700; color: #FFFFFF;">{{ \App\Models\Peminjaman::where('status', 'dipinjam')->count() }}</p>
+        </div>
+    </div>
+</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                
                 {{-- Quick Access --}}
                 <div style="background: #FFFDF8; border-radius: 14px; padding: 22px 24px; border: 1px solid #E8E2D4;">
                     <p style="font-size: 14px; font-weight: 600; color: #2D3A1E; margin: 0 0 16px;">⚡ Akses Cepat</p>

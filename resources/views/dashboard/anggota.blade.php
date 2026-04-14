@@ -70,17 +70,6 @@
                 Denda Saya
             </a>
 
-            <div style="margin-top: auto; padding-top: 16px;">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 12px; border-radius: 8px; background: none; border: 1px solid #4a5c2e; color: #C8DDB0; font-size: 13px; cursor: pointer;">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                        </svg>
-                        Logout
-                    </button>
-                </form>
-            </div>
         </aside>
 
         {{-- MAIN --}}

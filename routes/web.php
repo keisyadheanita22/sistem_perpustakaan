@@ -119,9 +119,9 @@ Route::middleware(['auth', 'role:kepala'])->prefix('kepala')->name('kepala.')->g
     Route::post('/profil/foto', [ProfilKepalaController::class, 'updateFoto'])->name('profil.foto');
 
     // Laporan Kepala
-    Route::get('/laporan', [KepalaController::class, 'laporan'])->name('laporan');
-    Route::get('/laporan/pdf', [KepalaController::class, 'exportPdf'])->name('laporan.pdf');
-    Route::get('/laporan/excel', [KepalaController::class, 'exportExcel'])->name('laporan.excel');
+        Route::get('/laporan', [KepalaController::class, 'laporan'])->name('laporan');
+        Route::get('/laporan/pdf', [KepalaController::class, 'exportPdf'])->name('laporan.pdf');
+        Route::get('/laporan/excel', [KepalaController::class, 'exportExcel'])->name('laporan.excel');
 
     // Kelola Petugas
     Route::get('/petugas', [KepalaController::class, 'indexPetugas'])->name('petugas.index');

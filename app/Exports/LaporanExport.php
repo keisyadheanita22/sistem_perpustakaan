@@ -13,15 +13,16 @@ class LaporanExport implements FromView, ShouldAutoSize
     public function __construct(protected $bulan, protected $tahun) {}
 
     public function view(): View
-    {
-        $peminjamans = Peminjaman::with('buku')
-            ->when($this->bulan, fn($q) => $q->whereMonth('tanggal_pinjam', $this->bulan))
-            ->get();
+{
+    // Tambahkan 'buku.kategori' agar data kategorinya ikut terambil (Eager Loading)
+    $peminjamans = Peminjaman::with(['buku.kategori'])
+        ->when($this->bulan, fn($q) => $q->whereMonth('tanggal_pinjam', $this->bulan))
+        ->get();
 
-        $dendas = Denda::when($this->bulan, fn($q) => $q->whereMonth('created_at', $this->bulan))
-            ->get();
+    $dendas = Denda::when($this->bulan, fn($q) => $q->whereMonth('created_at', $this->bulan))
+        ->get();
 
-        // Pakai satu file view saja yang isinya gabungan
-        return view('kepala.exports.gabungan-excel', compact('peminjamans', 'dendas'));
-    }
+    
+    return view('kepala.exports.gabungan-excel', compact('peminjamans', 'dendas'));
+}
 }

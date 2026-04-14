@@ -5,162 +5,197 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Anggota</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        {{-- Fungsi buka/tutup dropdown profil --}}
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+        {{-- Tutup dropdown kalau klik di luar area --}}
+        window.onclick = function(event) {
+            if (!event.target.closest('#userMenu')) {
+                const d = document.getElementById('userDropdown');
+                if(d) d.style.display = 'none';
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body style="margin: 0; font-family: ui-sans-serif, system-ui; background-color: #F5F0E8;">
 
-    <nav class="px-8 h-14 flex items-center justify-between" style="background-color:#db2777;">
-        <span class="text-white font-bold text-lg italic">Sistem Perpustakaan</span>
+    {{-- NAVBAR --}}
+    <nav style="background-color: #2D3A1E; height: 56px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #D4A017; position: sticky; top: 0; z-index: 100;">
+        {{-- Judul aplikasi --}}
+        <span style="color: #F5F0E8; font-size: 17px; font-weight: bold; font-style: italic;">Sistem Perpustakaan</span>
 
-        <a href="{{ route('petugas.profil') }}" class="flex items-center gap-2 text-white text-sm hover:opacity-80">
-            @if(Auth::user()->foto)
-                <img src="{{ asset('storage/' . Auth::user()->foto) }}"
-                     class="w-8 h-8 rounded-full object-cover">
-            @else
-                <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
-                    style="background-color:#9d174d;">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </div>
-            @endif
-            <span>{{ Auth::user()->name }}</span>
-        </a>
-    </nav>
+        {{-- Menu dropdown profil pengguna --}}
+        <div id="userMenu" style="position: relative; cursor: pointer;" onclick="toggleDropdown()">
+            <div style="display: flex; align-items: center; gap: 8px; color: #F5F0E8; font-size: 14px;">
+                {{-- Tampilkan foto profil kalau ada, kalau tidak tampilkan inisial --}}
+                @if(Auth::user()->foto)
+                    <img src="{{ asset('storage/' . Auth::user()->foto) }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #D4A017;">
+                @else
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background-color: #D4A017; color: #2D3A1E; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px;">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                @endif
+                <span>{{ Auth::user()->name }} ▾</span>
+            </div>
 
-    <div class="flex flex-1">
-        <aside class="w-44 flex flex-col py-4 gap-2" style="background-color:#db2777; min-height: calc(100vh - 56px);">
-            <a href="{{ route('petugas.dashboard') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Dashboard</a>
-            <a href="{{ route('buku.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Data Buku</a>
-            <a href="{{ route('anggota.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center font-bold" style="background-color:#831843;">Data Anggota</a>
-            <a href="{{ route('peminjaman.index') }}"
-                class="mx-3 px-4 py-2 rounded text-white text-sm text-center flex items-center justify-center gap-2"
-                style="background-color:#9d174d;">
-                    Peminjaman
-                    @if(!empty($perluVerifikasi) && $perluVerifikasi > 0)
-                        <span style="background-color:white; color:#db2777;"
-                            class="text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center leading-none">
-                            {{ $perluVerifikasi > 9 ? '9+' : $perluVerifikasi }}
-                        </span>
-                    @endif
-                </a>
-            <a href="{{ route('kategori.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Kategori</a>
-            <a href="{{ route('denda.index') }}" class="mx-3 px-4 py-2 rounded text-white text-sm text-center" style="background-color:#9d174d;">Denda</a>
-            <div class="mt-auto mx-3 pb-4">
+            {{-- Isi dropdown: profil & logout --}}
+            <div id="userDropdown" style="display: none; position: absolute; right: 0; top: 45px; width: 160px; background: white; border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border: 1px solid #E8E2D4; overflow: hidden;">
+                <a href="{{ route('petugas.profil') }}" style="display: block; padding: 12px 16px; color: #2D3A1E; text-decoration: none; font-size: 13px; font-weight: 600; border-bottom: 1px solid #F0EBE0;">Profil Saya</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded text-white text-sm" style="background-color:#9d174d;">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                        Logout
-                    </button>
+                    <button type="submit" style="width: 100%; text-align: left; background: none; border: none; padding: 12px 16px; color: #9d174d; font-size: 13px; font-weight: 600; cursor: pointer;">Logout</button>
                 </form>
             </div>
+        </div>
+    </nav>
+
+    <div style="display: flex; min-height: calc(100vh - 56px);">
+
+        {{-- SIDEBAR --}}
+        <aside style="width: 176px; background-color: #2D3A1E; padding: 20px 12px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
+            <span style="font-size: 10px; color: #7A9E5A; text-transform: uppercase; letter-spacing: 0.08em; padding: 0 8px; margin: 0 0 4px 0;">Menu Petugas</span>
+
+            {{-- Link dashboard --}}
+            <a href="{{ route('petugas.dashboard') }}" style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; color: #C8DDB0; font-size: 13px; text-decoration: none;">Dashboard</a>
+
+            {{-- Link data buku --}}
+            <a href="{{ route('buku.index') }}" style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; color: #C8DDB0; font-size: 13px; text-decoration: none;">Data Buku</a>
+
+            {{-- Link data anggota - aktif --}}
+            <a href="{{ route('anggota.index') }}" style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; background: #D4A017; color: #2D3A1E; font-size: 13px; text-decoration: none; font-weight: 600;">Data Anggota</a>
+
+            {{-- Link peminjaman + badge notifikasi --}}
+            <a href="{{ route('peminjaman.index') }}" style="display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: 8px; color: #C8DDB0; font-size: 13px; text-decoration: none;">
+                <span>Peminjaman</span>
+                @if(!empty($perluVerifikasi) && $perluVerifikasi > 0)
+                    <span style="background-color:#F5F0E8; color:#2D3A1E; font-size: 10px; font-weight: bold; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">
+                        {{ $perluVerifikasi > 9 ? '9+' : $perluVerifikasi }}
+                    </span>
+                @endif
+            </a>
+
+            {{-- Link kategori --}}
+            <a href="{{ route('kategori.index') }}" style="display: flex; align-items: center; padding: 9px 12px; border-radius: 8px; color: #C8DDB0; font-size: 13px; text-decoration: none;">Kategori</a>
+
+            {{-- Link denda --}}
+            <a href="{{ route('denda.index') }}" style="display: flex; align-items: center; padding: 9px 12px; border-radius: 8px; color: #C8DDB0; font-size: 13px; text-decoration: none;">Denda</a>
         </aside>
 
-        <main class="flex-1 p-8">
-            <div class="flex items-center gap-3 mb-6">
-                <a href="{{ route('anggota.index') }}" class="text-pink-600 hover:text-pink-800 text-sm flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                    Kembali
-                </a>
-                <h1 class="text-2xl font-bold text-gray-800">Edit Anggota</h1>
+        {{-- KONTEN UTAMA --}}
+        <main style="flex: 1; padding: 32px;">
+ 
+            {{-- Judul halaman --}}
+            <div style="margin-bottom: 24px;">
+                <h1 style="font-size: 24px; font-weight: 700; color: #2D3A1E; margin: 0;">Edit Anggota</h1>
             </div>
 
+            {{-- Notifikasi error validasi --}}
             @if($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
-                <ul class="list-disc list-inside">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+                <div style="background-color: #FFF1F1; border: 1px solid #fca5a5; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px;">
+                    <ul style="margin: 0; padding-left: 16px;">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
 
-            <div class="bg-white rounded-xl shadow p-6 max-w-lg">
+            {{-- Form edit anggota --}}
+            <div style="background: white; border-radius: 12px; border: 1px solid #D4A017; padding: 28px; max-width: 520px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.06);">
                 <form action="{{ route('anggota.update', $anggota->id) }}" method="POST">
                     @csrf
                     @method('PUT')
 
-                    {{-- ID Anggota (readonly) --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-600 mb-1">ID Anggota</label>
+                    {{-- ID Anggota readonly --}}
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #2D3A1E; margin-bottom: 6px;">ID Anggota</label>
                         <input type="text" value="{{ $anggota->id_anggota ?? '-' }}"
-                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-400 cursor-not-allowed"
+                            style="width: 100%; border: 1px solid #E8E2D4; border-radius: 8px; padding: 8px 12px; font-size: 13px; background: #F5F0E8; color: #8A7E6E; cursor: not-allowed; box-sizing: border-box;"
                             readonly>
                     </div>
 
                     {{-- Nama --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Nama</label>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #2D3A1E; margin-bottom: 6px;">Nama</label>
                         <input type="text" name="name" value="{{ old('name', $anggota->name) }}"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
+                            style="width: 100%; border: 1px solid #D4A017; border-radius: 8px; padding: 8px 12px; font-size: 13px; outline: none; box-sizing: border-box;"
                             required>
                     </div>
 
                     {{-- Email --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #2D3A1E; margin-bottom: 6px;">Email</label>
                         <input type="email" name="email" value="{{ old('email', $anggota->email) }}"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
+                            style="width: 100%; border: 1px solid #D4A017; border-radius: 8px; padding: 8px 12px; font-size: 13px; outline: none; box-sizing: border-box;"
                             required>
                     </div>
 
                     {{-- No Telepon --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-600 mb-1">No Telepon</label>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #2D3A1E; margin-bottom: 6px;">No Telepon</label>
                         <input type="text" name="no_telepon" value="{{ old('no_telepon', $anggota->no_telepon) }}"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                            style="width: 100%; border: 1px solid #D4A017; border-radius: 8px; padding: 8px 12px; font-size: 13px; outline: none; box-sizing: border-box;">
                     </div>
 
                     {{-- Username --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Username</label>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #2D3A1E; margin-bottom: 6px;">Username</label>
                         <input type="text" name="username" value="{{ old('username', $anggota->username) }}"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                            style="width: 100%; border: 1px solid #D4A017; border-radius: 8px; padding: 8px 12px; font-size: 13px; outline: none; box-sizing: border-box;">
                     </div>
 
-                    {{-- Password --}}
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-600 mb-1">
+                    {{-- Password baru --}}
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #2D3A1E; margin-bottom: 6px;">
                             Password Baru
-                            <span class="text-gray-400 font-normal">(kosongkan jika tidak diubah)</span>
+                            <span style="color: #8A7E6E; font-weight: 400;">(kosongkan jika tidak diubah)</span>
                         </label>
-                        <div class="flex gap-2">
+                        <div style="display: flex; gap: 8px;">
+                            {{-- Input password --}}
                             <input type="password" name="password" id="passwordInput"
                                 placeholder="Masukkan password baru..."
-                                class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                                style="flex: 1; border: 1px solid #D4A017; border-radius: 8px; padding: 8px 12px; font-size: 13px; outline: none;">
+                            {{-- Tombol reset password --}}
                             <button type="button" onclick="resetPassword()"
-                                class="px-3 py-2 rounded-lg text-white text-xs font-medium"
-                                style="background-color:#db2777;">
+                                style="padding: 8px 14px; background-color: #1E3A5F; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">
                                 Reset Default
                             </button>
                         </div>
-                        <p id="pwdHint" class="text-xs text-gray-400 mt-1 hidden">
+
+                        {{-- Hint setelah reset --}}
+                        <p id="pwdHint" style="font-size: 11px; color: #8A7E6E; margin-top: 6px; display: none;">
                             Password direset ke: <strong>12345678</strong> — minta anggota ganti setelah login.
                         </p>
                     </div>
 
-                    {{-- Tombol --}}
-                    <div class="flex gap-3">
+                    {{-- Tombol batal dan simpan --}}
+                    <div style="display: flex; gap: 10px;">
                         <a href="{{ route('anggota.index') }}"
-                            class="px-5 py-2 rounded-lg border border-gray-300 text-sm text-gray-600 hover:bg-gray-50">
+                            style="padding: 9px 20px; border-radius: 8px; border: 1px solid #E8E2D4; font-size: 13px; color: #8A7E6E; text-decoration: none; background: white;">
                             Batal
                         </a>
                         <button type="submit"
-                            class="px-5 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90"
-                            style="background-color:#db2777;">
+                            style="padding: 9px 20px; border-radius: 8px; background-color: #2D3A1E; color: #D4A017; border: 1px solid #D4A017; font-size: 13px; font-weight: 600; cursor: pointer;">
                             Simpan Perubahan
                         </button>
                     </div>
                 </form>
             </div>
+
         </main>
     </div>
 
     <script>
+        // Fungsi reset password ke default
         function resetPassword() {
             const input = document.getElementById('passwordInput');
             const hint = document.getElementById('pwdHint');
             input.value = '12345678';
             input.type = 'text';
-            hint.classList.remove('hidden');
+            hint.style.display = 'block';
             setTimeout(() => {
                 input.type = 'password';
             }, 3000);

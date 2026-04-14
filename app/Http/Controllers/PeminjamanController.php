@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Peminjaman;
-use App\Models\User;   // ✅ Ganti Anggota -> User
+use App\Models\User;   
 use App\Models\Buku;
 use Illuminate\Http\Request;
 
@@ -28,7 +28,6 @@ class PeminjamanController extends Controller
     // ===== PETUGAS: Halaman form tambah peminjaman =====
     public function create()
     {
-        // ✅ Ambil hanya user dengan role anggota (bukan dari tabel anggotas)
         $anggota = User::where('role', 'anggota')->get();
 
         // Hanya tampilkan buku yang stoknya masih ada
@@ -47,7 +46,6 @@ class PeminjamanController extends Controller
             'tanggal_kembali' => 'required|date',
         ]);
 
-        // ✅ Cari anggota dari tabel users (bukan anggotas)
         $anggota = User::findOrFail($request->anggota_id);
 
         // Generate ID peminjaman otomatis: PM001, PM002, dst
@@ -58,7 +56,7 @@ class PeminjamanController extends Controller
         Peminjaman::create([
             'id_peminjaman'   => $idPeminjaman,
             'id_anggota'      => $anggota->id_anggota,
-            'nama_anggota'    => $anggota->name,   // ✅ users pakai 'name' bukan 'nama'
+            'nama_anggota'    => $anggota->name,   
             'buku_id'         => $request->buku_id,
             'tanggal_pinjam'  => $request->tanggal_pinjam,
             'tanggal_kembali' => $request->tanggal_kembali,
@@ -75,29 +73,42 @@ class PeminjamanController extends Controller
 
     // ===== ANGGOTA: Pinjam buku dari halaman katalog =====
     public function pinjam($buku_id)
-    {
-        $buku = Buku::findOrFail($buku_id);
-        $user = auth()->user();
+{
+    $buku = Buku::findOrFail($buku_id);
+    $user = auth()->user();
 
-        // Generate ID peminjaman otomatis: PM001, PM002, dst
-        $last         = Peminjaman::orderBy('id', 'desc')->first();
-        $newNumber    = $last ? (int) substr($last->id_peminjaman, 2) + 1 : 1;
-        $idPeminjaman = 'PM' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+    // Hitung peminjaman aktif milik anggota ini
+    // Status yang dihitung: menunggu, dipinjam, mengembalikan (belum selesai)
+    $pinjamAktif = Peminjaman::where('id_anggota', $user->id_anggota)
+        ->whereIn('status', ['menunggu', 'dipinjam', 'mengembalikan'])
+        ->count();
 
-        Peminjaman::create([
-            'id_peminjaman'   => $idPeminjaman,
-            'id_anggota'      => $user->id_anggota,
-            'nama_anggota'    => $user->name,
-            'buku_id'         => $buku->id,
-            'tanggal_pinjam'  => now(),
-            'tanggal_kembali' => now()->addDays(7), // Batas kembali otomatis 7 hari
-            'status'          => 'menunggu', // Anggota pinjam = menunggu verifikasi petugas
-        ]);
-        // Catatan: stok belum dikurangi, dikurangi nanti saat petugas verifikasi
-
+    // Kalau sudah 3 atau lebih, tolak peminjaman baru
+    // Anggota harus kembalikan dulu minimal 1 buku sebelum bisa pinjam lagi
+    if ($pinjamAktif >= 3) {
         return redirect()->route('katalog.index')
-            ->with('success', 'Permintaan peminjaman berhasil dikirim, tunggu verifikasi petugas!');
+            ->with('error', 'Batas peminjaman maksimal 3 buku! Kembalikan buku terlebih dahulu.');
     }
+
+    // Generate ID peminjaman otomatis: PM001, PM002, dst
+    $last         = Peminjaman::orderBy('id', 'desc')->first();
+    $newNumber    = $last ? (int) substr($last->id_peminjaman, 2) + 1 : 1;
+    $idPeminjaman = 'PM' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+
+    Peminjaman::create([
+        'id_peminjaman'   => $idPeminjaman,
+        'id_anggota'      => $user->id_anggota,
+        'nama_anggota'    => $user->name,
+        'buku_id'         => $buku->id,
+        'tanggal_pinjam'  => now(),
+        'tanggal_kembali' => now()->addDays(7), // Batas kembali otomatis 7 hari
+        'status'          => 'menunggu', // Anggota pinjam = menunggu verifikasi petugas
+    ]);
+    // Catatan: stok belum dikurangi, dikurangi nanti saat petugas verifikasi
+
+    return redirect()->route('katalog.index')
+        ->with('success', 'Permintaan peminjaman berhasil dikirim, tunggu verifikasi petugas!');
+}
 
     // ===== ANGGOTA: Halaman "Peminjaman Saya" =====
     public function peminjamanSaya()

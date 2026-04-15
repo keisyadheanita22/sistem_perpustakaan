@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Peminjaman;
 use App\Models\User;   
 use App\Models\Buku;
+use App\Models\Denda;
+use App\Models\Pengaturan; 
 use Illuminate\Http\Request;
 
 class PeminjamanController extends Controller
@@ -200,7 +202,7 @@ class PeminjamanController extends Controller
     }
 
     // ===== PETUGAS: Halaman form edit peminjaman =====
-    public function edit($id) // ✅ pakai $id bukan route model binding
+    public function edit($id) 
     {
         // Cari peminjaman berdasarkan id, otomatis 404 kalau tidak ketemu
         $peminjaman = Peminjaman::findOrFail($id);
@@ -228,16 +230,49 @@ class PeminjamanController extends Controller
         return redirect()->route('peminjaman.index')
             ->with('success', 'Peminjaman berhasil diupdate!');
     }
+public function dendaRusak($id)
+{
+    $peminjaman = Peminjaman::findOrFail($id);
+    $dendaRusak = Pengaturan::where('kunci', 'denda_buku_rusak')->first()->nilai; // ← fix
 
-    // ===== PETUGAS: Hapus data peminjaman =====
-    public function destroy($id) // ✅ pakai $id bukan route model binding
-    {
-        // Cari peminjaman berdasarkan id, otomatis 404 kalau tidak ketemu
-        $peminjaman = Peminjaman::findOrFail($id);
+    Denda::create([
+        'peminjaman_id'  => $peminjaman->id,
+        'nama_anggota'   => $peminjaman->nama_anggota,
+        'judul_buku'     => $peminjaman->buku->judul,
+        'jenis_denda'    => 'rusak',
+        'hari_terlambat' => 0,
+        'denda_per_hari' => 0,
+        'total_denda'    => $dendaRusak,
+        'status_bayar'   => 'belum_bayar',
+    ]);
 
-        $peminjaman->delete();
+    $peminjaman->update(['status' => 'dikembalikan']);
+    $peminjaman->buku->increment('stok');
 
-        return redirect()->route('peminjaman.index')
-            ->with('success', 'Peminjaman berhasil dihapus!');
-    }
+    return redirect()->route('peminjaman.index')
+        ->with('success', 'Buku ditandai rusak, denda berhasil dibuat.');
 }
+
+public function dendaHilang($id)
+{
+    $peminjaman = Peminjaman::findOrFail($id);
+    $dendaHilang = Pengaturan::where('kunci', 'denda_buku_hilang')->first()->nilai; // ← fix
+
+    Denda::create([
+        'peminjaman_id'  => $peminjaman->id,
+        'nama_anggota'   => $peminjaman->nama_anggota,
+        'judul_buku'     => $peminjaman->buku->judul,
+        'jenis_denda'    => 'hilang',
+        'hari_terlambat' => 0,
+        'denda_per_hari' => 0,
+        'total_denda'    => $dendaHilang,
+        'status_bayar'   => 'belum_bayar',
+    ]);
+
+    $peminjaman->update(['status' => 'dikembalikan']);
+
+    return redirect()->route('peminjaman.index')
+        ->with('success', 'Buku ditandai hilang, denda berhasil dibuat.');
+}
+}
+   

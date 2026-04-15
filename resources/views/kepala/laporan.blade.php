@@ -192,53 +192,131 @@
             </div>
         </div>
         {{-- AKHIR TABEL PEMINJAMAN --}}
+{{-- TABEL LAPORAN DENDA --}}
+<div style="background: #FFFDF8; border-radius: 14px; border: 1px solid #E8E2D4; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(45,58,30,0.05);">
 
-        {{-- TABEL LAPORAN DENDA --}}
-        <div style="background: #FFFDF8; border-radius: 14px; border: 1px solid #E8E2D4; overflow: hidden; box-shadow: 0 2px 8px rgba(45,58,30,0.05);">
-            <div style="padding: 14px 20px; border-bottom: 1px solid #E8E2D4; background: #2D3A1E; display: flex; align-items: center; gap: 8px;">
-                <span>💰</span>
-                <h2 style="font-size: 13px; font-weight: 700; color: #D4A017; margin: 0; text-transform: uppercase; letter-spacing: 0.06em;">Laporan Denda</h2>
-            </div>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 12.5px;">
-                    <thead>
-                        <tr style="background: #2D3A1E;">
-                            <th style="padding: 11px 16px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #D4A017;">No</th>
-                            <th style="padding: 11px 16px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #D4A017;">Anggota</th>
-                            <th style="padding: 11px 16px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #D4A017;">Total Denda</th>
-                            <th style="padding: 11px 16px; text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #D4A017;">Status Bayar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($dendas as $i => $d)
-                        <tr style="border-top: 1px solid #EDE7DA; {{ $i % 2 == 1 ? 'background-color: #F5F0E8;' : '' }}">
-                            <td style="padding: 11px 16px; color: #A09080;">{{ $i + 1 }}</td>
-                            <td style="padding: 11px 16px; font-weight: 600; text-transform: uppercase; font-size: 11.5px; color: #2D3A1E;">{{ $d->nama_anggota }}</td>
-                            <td style="padding: 11px 16px; font-weight: 700; color: #8B3A3A;">Rp {{ number_format($d->total_denda, 0, ',', '.') }}</td>
-                            <td style="padding: 11px 16px; text-align: center;">
-                                {{-- Warna badge status bayar --}}
-                                @php
-                                    if ($d->status_bayar === 'sudah_bayar') { $bgD = '#E8F0DC'; $tcD = '#2D3A1E'; }
-                                    else { $bgD = '#F8D7DA'; $tcD = '#8B3A3A'; }
-                                @endphp
-                                <span style="display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; background: {{ $bgD }}; color: {{ $tcD }};">
-                                    {{ $d->status_bayar }}
-                                </span>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 32px; color: #8A7E6E; font-size: 13px;">Tidak ada data denda.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {{-- AKHIR TABEL DENDA --}}
+    {{-- HEADER CARD --}}
+    <div style="padding: 14px 20px; border-bottom: 1px solid #E8E2D4; background: #2D3A1E; display: flex; align-items: center; gap: 8px;">
+        <span>💰</span>
+        <h2 style="font-size: 13px; font-weight: 700; color: #D4A017; margin: 0; text-transform: uppercase; letter-spacing: 0.06em;">
+            Laporan Denda
+        </h2>
+    </div>
 
-    </main>
+    {{-- WRAPPER TABLE --}}
+    <div style="overflow-x: auto;">
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 12.5px;">
+
+            {{-- HEADER TABLE --}}
+            <thead>
+                <tr style="background: #2D3A1E;">
+                    <th style="padding: 11px 16px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #D4A017;">No</th>
+
+                    <th style="padding: 11px 16px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #D4A017;">
+                        Anggota
+                    </th>
+
+                    {{-- Kolom jenis denda --}}
+                    <th style="padding: 11px 16px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #D4A017;">
+                        Jenis
+                    </th>
+
+                    <th style="padding: 11px 16px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #D4A017;">
+                        Total Denda
+                    </th>
+
+                    <th style="padding: 11px 16px; text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #D4A017;">
+                        Status Bayar
+                    </th>
+                </tr>
+            </thead>
+
+            {{-- BODY TABLE --}}
+            <tbody>
+
+                {{-- Loop data denda --}}
+                @forelse($dendas as $i => $d)
+                <tr style="border-top: 1px solid #EDE7DA; {{ $i % 2 == 1 ? 'background-color: #F5F0E8;' : '' }}">
+
+                    {{-- Nomor --}}
+                    <td style="padding: 11px 16px; color: #A09080;">
+                        {{ $i + 1 }}
+                    </td>
+
+                    {{-- Nama anggota --}}
+                    <td style="padding: 11px 16px; font-weight: 600; text-transform: uppercase; font-size: 11.5px; color: #2D3A1E;">
+                        {{ $d->nama_anggota }}
+                    </td>
+
+                    {{-- Badge jenis denda --}}
+                    <td style="padding: 11px 16px;">
+                        @if($d->jenis_denda == 'rusak')
+
+                            {{-- Denda buku rusak --}}
+                            <span style="display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; background: #FEF9C3; color: #854D0E;">
+                                🔧 Rusak
+                            </span>
+
+                        @elseif($d->jenis_denda == 'hilang')
+
+                            {{-- Denda buku hilang --}}
+                            <span style="display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; background: #FEE2E2; color: #7F1D1D;">
+                                ❌ Hilang
+                            </span>
+
+                        @else
+
+                            {{-- Denda keterlambatan --}}
+                            <span style="display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; background: #EDE9FE; color: #5B21B6;">
+                                🕐 Terlambat
+                            </span>
+
+                        @endif
+                    </td>
+
+                    {{-- Total denda --}}
+                    <td style="padding: 11px 16px; font-weight: 700; color: #8B3A3A;">
+                        Rp {{ number_format($d->total_denda, 0, ',', '.') }}
+                    </td>
+
+                    {{-- Status pembayaran --}}
+                    <td style="padding: 11px 16px; text-align: center;">
+
+                        @php
+                            if ($d->status_bayar === 'sudah_bayar') {
+                                $bgD = '#E8F0DC';
+                                $tcD = '#2D3A1E';
+                            } else {
+                                $bgD = '#F8D7DA';
+                                $tcD = '#8B3A3A';
+                            }
+                        @endphp
+
+                        <span style="display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; background: {{ $bgD }}; color: {{ $tcD }};">
+                            {{ $d->status_bayar }}
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                {{-- Jika tidak ada data --}}
+                @empty
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 32px; color: #8A7E6E; font-size: 13px;">
+                        Tidak ada data denda.
+                    </td>
+                </tr>
+                @endforelse
+
+            </tbody>
+
+        </table>
+
+    </div>
 </div>
+{{-- AKHIR TABEL DENDA --}}
 
 {{-- JAVASCRIPT: Toggle dropdown profil & tutup saat klik di luar --}}
 <script>

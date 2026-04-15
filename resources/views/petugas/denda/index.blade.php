@@ -148,30 +148,26 @@
                 </div>
             @endif
 
-            {{-- Card ketentuan denda - info denda per hari + tombol ubah --}}
-            <div style="background: #FFFDF8; border-radius: 12px; border: 1px solid #D4A017; box-shadow: 0 4px 10px rgba(0,0,0,0.06); padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 16px;">
+         {{-- Card ketentuan denda - info denda per hari + tombol ubah --}}
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; background: #FFFDF8; border: 1px solid #E8E2D4; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px;">
+    <div>
+        <p style="font-size: 13px; font-weight: 700; color: #2D3A1E; margin: 0;">Ketentuan Denda</p>
+        <p style="font-size: 13px; color: #8A7E6E; margin: 4px 0 0 0;">
+            Keterlambatan: <span style="font-weight: 700; color: #D4A017;">Rp {{ number_format($dendaPerHari, 0, ',', '.') }} / hari</span>
+            &nbsp;·&nbsp;
+            Buku Rusak: <span style="font-weight: 700; color: #92400E;">Rp {{ number_format($dendaRusak, 0, ',', '.') }}</span>
+            &nbsp;·&nbsp;
+            Buku Hilang: <span style="font-weight: 700; color: #991b1b;">Rp {{ number_format($dendaHilang, 0, ',', '.') }}</span>
+        </p>
+        <p style="font-size: 12px; color: #991b1b; font-weight: 600; margin: 2px 0 0 0;">Batas keterlambatan maksimal = 7 hari (1 minggu)</p>
+    </div>
 
-                    {{-- Ikon pin ketentuan --}}
-                    <div style="width: 44px; height: 44px; border-radius: 10px; background-color: #FEF3C7; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;">
-                        📌
-                    </div>
-                    <div>
-                        <p style="font-size: 13px; font-weight: 700; color: #2D3A1E; margin: 0;">Ketentuan Denda</p>
-                        <p style="font-size: 13px; color: #8A7E6E; margin: 4px 0 0 0;">
-                            Denda keterlambatan =
-                            <span style="font-weight: 700; color: #D4A017;">Rp {{ number_format($dendaPerHari, 0, ',', '.') }} / hari</span>
-                        </p>
-                        <p style="font-size: 12px; color: #991b1b; font-weight: 600; margin: 2px 0 0 0;">Batas keterlambatan maksimal = 7 hari (1 minggu)</p>
-                    </div>
-                </div>
-
-                {{-- Tombol ubah pengaturan denda, aksen biru tua --}}
-                <a href="{{ route('denda.pengaturan') }}"
-                   style="display: flex; align-items: center; gap: 6px; padding: 9px 16px; background-color: #1E3A5F; color: #DBEAFE; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; flex-shrink: 0;">
-                    ⚙️ Ubah Denda
-                </a>
-            </div>
+    {{-- Tombol ubah pengaturan denda --}}
+    <a href="{{ route('denda.pengaturan') }}"
+       style="display: flex; align-items: center; gap: 6px; padding: 9px 16px; background-color: #1E3A5F; color: #DBEAFE; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; flex-shrink: 0;">
+        ⚙️ Ubah Denda
+    </a>
+</div>  {{-- ← div pembungkus ditutup di sini --}}
 
             {{-- Tabel denda --}}
             <div style="background: #F9F9F9; border-radius: 12px; border: 1px solid #D4A017; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
@@ -183,6 +179,7 @@
                             <th style="padding: 14px 16px; color: #F5F0E8;">No</th>
                             <th style="padding: 14px 16px; color: #F5F0E8;">Nama Anggota</th>
                             <th style="padding: 14px 16px; color: #F5F0E8;">Judul Buku</th>
+                            <th style="padding: 14px 16px; color: #F5F0E8;">Jenis</th>
                             <th style="padding: 14px 16px; color: #F5F0E8;">Terlambat</th>
                             <th style="padding: 14px 16px; color: #F5F0E8;">Denda/Hari</th>
                             <th style="padding: 14px 16px; color: #F5F0E8;">Total Denda</th>
@@ -192,6 +189,7 @@
                     </thead>
 
                     <tbody>
+                        
                         {{-- Looping data denda --}}
                         @forelse ($dendas as $item)
                         <tr style="border-bottom: 1px solid #E8E2D4; background-color: #FFFFFF; transition: background 0.15s;"
@@ -206,6 +204,17 @@
 
                             {{-- Judul buku --}}
                             <td style="padding: 14px 16px; color: #2D3A1E;">{{ $item->judul_buku }}</td>
+
+                             {{-- Jenis--}}
+                            <td style="padding: 14px 16px;">
+                            @if($item->jenis_denda === 'rusak')
+                                <span style="background:#FEF3C7; color:#92400E; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;">🔧 Rusak</span>
+                            @elseif($item->jenis_denda === 'hilang')
+                                <span style="background:#FEE2E2; color:#991b1b; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;">❌ Hilang</span>
+                            @else
+                                <span style="background:#E0F2FE; color:#075985; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;">⏰ Terlambat</span>
+                            @endif
+                        </td>
 
                             {{-- Hari terlambat, badge merah --}}
                             <td style="padding: 14px 16px;">
@@ -248,20 +257,21 @@
                                         <span style="color: #8A7E6E; font-size: 11px;">Lunas ✓</span>
                                     @endif
 
-                                    {{-- Tombol cetak bukti denda --}}
-                                    <button
-                                        type="button"
-                                        class="btn-cetak"
-                                        style="padding: 5px 10px; background: #DBEAFE; color: #1E3A5F; border: 1px solid #93C5FD; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;"
-                                        data-nama="{{ $item->nama_anggota }}"
-                                        data-judul="{{ $item->judul_buku }}"
-                                        data-hari="{{ $item->hari_terlambat }}"
-                                        data-per-hari="{{ $item->denda_per_hari }}"
-                                        data-total="{{ $item->total_denda }}"
-                                        data-status="{{ $item->status_bayar }}">
-                                        🖨️ Cetak
-                                    </button>
-                                </div>
+                                   {{-- Tombol detail, buka modal detail denda --}}
+                                        <button
+                                            type="button"
+                                            class="btn-detail"
+                                            style="padding: 5px 10px; background: #DBEAFE; color: #1E3A5F; border: 1px solid #93C5FD; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;"
+                                            data-nama="{{ $item->nama_anggota }}"
+                                            data-judul="{{ $item->judul_buku }}"
+                                            data-jenis="{{ $item->jenis_denda }}"
+                                            data-hari="{{ $item->hari_terlambat }}"
+                                            data-per-hari="{{ $item->denda_per_hari }}"
+                                            data-total="{{ $item->total_denda }}"
+                                            data-status="{{ $item->status_bayar }}">
+                                            🔍 Detail
+                                        </button>
+                                    </div>
                             </td>
                         </tr>
 
@@ -284,111 +294,149 @@
     </div>
 
     {{-- ============================== --}}
-    {{-- MODAL CETAK BUKTI DENDA        --}}
-    {{-- ============================== --}}
-    <div id="print-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-        <div style="background: white; border-radius: 16px; width: 500px; max-width: 95vw; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border: 1px solid #D4A017;">
+{{-- MODAL DETAIL & CETAK DENDA     --}}
+{{-- ============================== --}}
+<div id="print-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; width: 500px; max-width: 95vw; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border: 1px solid #D4A017;">
 
-            {{-- Header modal --}}
-            <div style="background: #2D3A1E; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;">
-                <span style="color: #F5F0E8; font-size: 14px; font-weight: 700;">🖨️ Bukti Denda Perpustakaan</span>
-                <button onclick="closePrintModal()"
-                        style="background: none; border: none; color: #C8DDB0; font-size: 20px; cursor: pointer; line-height: 1;">&times;</button>
-            </div>
+        {{-- Header modal --}}
+        <div style="background: #2D3A1E; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="color: #F5F0E8; font-size: 14px; font-weight: 700;">🔍 Detail Denda</span>
+            <button onclick="closePrintModal()"
+                    style="background: none; border: none; color: #C8DDB0; font-size: 20px; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
 
-            {{-- Area konten yang akan dicetak --}}
-            <div id="print-area" style="padding: 32px; font-family: ui-sans-serif, system-ui; color: #2D3A1E;">
-                <h2 style="text-align: center; color: #2D3A1E; margin: 0 0 4px 0; font-size: 18px; font-weight: 700;">BUKTI DENDA PERPUSTAKAAN</h2>
-                <p style="text-align: center; color: #8A7E6E; font-size: 12px; margin: 0 0 20px 0;">Sistem Perpustakaan</p>
-                <div style="border-top: 2px solid #D4A017; margin-bottom: 20px;"></div>
+        {{-- Area konten detail yang akan dicetak --}}
+        <div id="print-area" style="padding: 32px; font-family: ui-sans-serif, system-ui; color: #2D3A1E;">
 
-                <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-                    <tr><td style="padding: 7px 0; color: #8A7E6E; width: 45%;">Nama Anggota</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-nama"></span></td></tr>
-                    <tr><td style="padding: 7px 0; color: #8A7E6E;">Judul Buku</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-judul"></span></td></tr>
-                    <tr><td style="padding: 7px 0; color: #8A7E6E;">Hari Terlambat</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-hari"></span> hari</td></tr>
-                    <tr><td style="padding: 7px 0; color: #8A7E6E;">Denda/Hari</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-per-hari"></span></td></tr>
-                    <tr>
-                        <td style="padding: 7px 0; color: #8A7E6E;">Total Denda</td>
-                        <td style="padding: 7px 0;">: <span id="p-total" style="font-weight: 700; color: #991b1b; font-size: 14px;"></span></td>
-                    </tr>
-                    <tr><td style="padding: 7px 0; color: #8A7E6E;">Status</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-status"></span></td></tr>
-                    <tr><td style="padding: 7px 0; color: #8A7E6E;">Tanggal Cetak</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-tanggal"></span></td></tr>
-                </table>
+            {{-- Judul bukti --}}
+            <h2 style="text-align: center; color: #2D3A1E; margin: 0 0 4px 0; font-size: 18px; font-weight: 700;">BUKTI DENDA PERPUSTAKAAN</h2>
+            <p style="text-align: center; color: #8A7E6E; font-size: 12px; margin: 0 0 20px 0;">Sistem Perpustakaan</p>
 
-                <div style="border-top: 1px solid #E8E2D4; margin-top: 20px; padding-top: 14px;">
-                    <p style="text-align: center; font-size: 11px; color: #8A7E6E; margin: 0;">Terima kasih telah menggunakan layanan perpustakaan kami.</p>
-                </div>
-            </div>
+            {{-- Garis pemisah emas --}}
+            <div style="border-top: 2px solid #D4A017; margin-bottom: 20px;"></div>
 
-            {{-- Tombol aksi modal --}}
-            <div class="no-print" style="display: flex; gap: 10px; padding: 0 24px 24px; justify-content: flex-end;">
-                <button onclick="closePrintModal()"
-                        style="padding: 9px 20px; border: 1px solid #E8E2D4; border-radius: 8px; background: white; cursor: pointer; font-size: 13px; color: #8A7E6E; font-weight: 600;">
-                    Tutup
-                </button>
-                <button onclick="doPrint()"
-                        style="padding: 9px 20px; background: #2D3A1E; color: #F5F0E8; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;">
-                    🖨️ Print
-                </button>
+            {{-- Tabel isi detail denda --}}
+            <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                {{-- Nama anggota --}}
+                <tr><td style="padding: 7px 0; color: #8A7E6E; width: 45%;">Nama Anggota</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-nama"></span></td></tr>
+
+                {{-- Judul buku --}}
+                <tr><td style="padding: 7px 0; color: #8A7E6E;">Judul Buku</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-judul"></span></td></tr>
+
+                {{-- Jenis denda: terlambat / rusak / hilang --}}
+                <tr><td style="padding: 7px 0; color: #8A7E6E;">Jenis Denda</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-jenis"></span></td></tr>
+
+                {{-- Hari terlambat, hanya relevan untuk jenis terlambat --}}
+                <tr><td style="padding: 7px 0; color: #8A7E6E;">Hari Terlambat</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-hari"></span> hari</td></tr>
+
+                {{-- Denda per hari --}}
+                <tr><td style="padding: 7px 0; color: #8A7E6E;">Denda/Hari</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-per-hari"></span></td></tr>
+
+                {{-- Total denda, ditampilkan merah tebal --}}
+                <tr>
+                    <td style="padding: 7px 0; color: #8A7E6E;">Total Denda</td>
+                    <td style="padding: 7px 0;">: <span id="p-total" style="font-weight: 700; color: #991b1b; font-size: 14px;"></span></td>
+                </tr>
+
+                {{-- Status pembayaran --}}
+                <tr><td style="padding: 7px 0; color: #8A7E6E;">Status</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-status"></span></td></tr>
+
+                {{-- Tanggal cetak otomatis dari JS --}}
+                <tr><td style="padding: 7px 0; color: #8A7E6E;">Tanggal Cetak</td><td style="padding: 7px 0; font-weight: 600; color: #2D3A1E;">: <span id="p-tanggal"></span></td></tr>
+            </table>
+
+            {{-- Footer bukti --}}
+            <div style="border-top: 1px solid #E8E2D4; margin-top: 20px; padding-top: 14px;">
+                <p style="text-align: center; font-size: 11px; color: #8A7E6E; margin: 0;">Terima kasih telah menggunakan layanan perpustakaan kami.</p>
             </div>
         </div>
+
+        {{-- Tombol aksi modal: tutup & cetak --}}
+        <div class="no-print" style="display: flex; gap: 10px; padding: 0 24px 24px; justify-content: flex-end;">
+
+            {{-- Tombol tutup modal --}}
+            <button onclick="closePrintModal()"
+                    style="padding: 9px 20px; border: 1px solid #E8E2D4; border-radius: 8px; background: white; cursor: pointer; font-size: 13px; color: #8A7E6E; font-weight: 600;">
+                Tutup
+            </button>
+
+            {{-- Tombol print bukti denda --}}
+            <button onclick="doPrint()"
+                    style="padding: 9px 20px; background: #2D3A1E; color: #F5F0E8; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;">
+                🖨️ Print
+            </button>
+        </div>
     </div>
+</div>
 
-    <style>
-        @media print {
-            body > *:not(#print-overlay) { display: none !important; }
-            #print-overlay { display: block !important; position: static !important; background: none !important; }
-            #print-overlay > div { box-shadow: none !important; width: 100% !important; }
-            .no-print { display: none !important; }
-        }
-    </style>
+<style>
+    @media print {
+        body > *:not(#print-overlay) { display: none !important; }
+        #print-overlay { display: block !important; position: static !important; background: none !important; }
+        #print-overlay > div { box-shadow: none !important; width: 100% !important; }
+        .no-print { display: none !important; }
+    }
+</style>
 
-    <script>
-        // Buka modal cetak saat tombol cetak diklik, isi data dari data-attribute tombol
-        document.querySelectorAll('.btn-cetak').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                const nama    = this.dataset.nama;
-                const judul   = this.dataset.judul;
-                const hari    = this.dataset.hari;
-                const perHari = this.dataset.perHari;
-                const total   = this.dataset.total;
-                const status  = this.dataset.status;
+<script>
+    // Buka modal detail saat tombol Detail diklik
+    // Ambil semua data dari data-attribute tombol lalu isi ke dalam modal
+    document.querySelectorAll('.btn-detail').forEach(function(btn) {
+        btn.addEventListener('click', function() {
 
-                const statusLabel = status === 'belum_bayar' ? 'Belum Bayar' : 'Sudah Bayar';
-                const tanggal = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+            // Ambil data dari attribute tombol
+            const nama    = this.dataset.nama;
+            const judul   = this.dataset.judul;
+            const jenis   = this.dataset.jenis;
+            const hari    = this.dataset.hari;
+            const perHari = this.dataset.perHari;
+            const total   = this.dataset.total;
+            const status  = this.dataset.status;
 
-                document.getElementById('p-nama').textContent     = nama;
-                document.getElementById('p-judul').textContent    = judul;
-                document.getElementById('p-hari').textContent     = hari;
-                document.getElementById('p-per-hari').textContent = 'Rp ' + parseInt(perHari).toLocaleString('id-ID');
-                document.getElementById('p-total').textContent    = 'Rp ' + parseInt(total).toLocaleString('id-ID');
-                document.getElementById('p-status').textContent   = statusLabel;
-                document.getElementById('p-tanggal').textContent  = tanggal;
+            // Format label jenis denda supaya lebih rapi
+            const jenisLabel = jenis === 'rusak' ? '🔧 Rusak'
+                             : jenis === 'hilang' ? '❌ Hilang'
+                             : '⏰ Terlambat';
 
-                document.getElementById('print-modal').style.display = 'flex';
-            });
+            // Format label status pembayaran
+            const statusLabel = status === 'belum_bayar' ? 'Belum Bayar' : 'Sudah Bayar';
+
+            // Format tanggal cetak otomatis hari ini
+            const tanggal = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+            // Isi semua field di modal dengan data yang sudah diambil
+            document.getElementById('p-nama').textContent     = nama;
+            document.getElementById('p-judul').textContent    = judul;
+            document.getElementById('p-jenis').textContent    = jenisLabel;
+            document.getElementById('p-hari').textContent     = hari;
+            document.getElementById('p-per-hari').textContent = 'Rp ' + parseInt(perHari).toLocaleString('id-ID');
+            document.getElementById('p-total').textContent    = 'Rp ' + parseInt(total).toLocaleString('id-ID');
+            document.getElementById('p-status').textContent   = statusLabel;
+            document.getElementById('p-tanggal').textContent  = tanggal;
+
+            // Tampilkan modal
+            document.getElementById('print-modal').style.display = 'flex';
         });
+    });
 
-        // Tutup modal cetak
-        function closePrintModal() {
-            document.getElementById('print-modal').style.display = 'none';
-        }
+    // Tutup modal detail
+    function closePrintModal() {
+        document.getElementById('print-modal').style.display = 'none';
+    }
 
-        // Proses print: ambil isi print-area, ganti body sementara, print, lalu reload
-        function doPrint() {
-            const printContents = document.getElementById('print-area').innerHTML;
-            const original = document.body.innerHTML;
-            document.body.innerHTML = `<div style="padding:50px; font-family:ui-sans-serif,system-ui;">${printContents}</div>`;
-            window.print();
-            document.body.innerHTML = original;
-            location.reload();
-        }
+    // Proses print: ambil isi print-area, ganti body sementara, print, lalu reload halaman
+    function doPrint() {
+        const printContents = document.getElementById('print-area').innerHTML;
+        const original = document.body.innerHTML;
+        document.body.innerHTML = `<div style="padding:50px; font-family:ui-sans-serif,system-ui;">${printContents}</div>`;
+        window.print();
+        document.body.innerHTML = original;
+        location.reload();
+    }
 
-        // Tutup modal kalau klik di luar area modal
-        document.getElementById('print-modal').addEventListener('click', function(e) {
-            if (e.target === this) closePrintModal();
-        });
-    </script>
-
-</body>
-</html>
+    // Tutup modal kalau klik di luar area modal (klik overlay)
+    document.getElementById('print-modal').addEventListener('click', function(e) {
+        if (e.target === this) closePrintModal();
+    });
+</script>

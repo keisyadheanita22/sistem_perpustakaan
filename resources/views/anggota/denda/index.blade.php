@@ -107,62 +107,97 @@
             {{-- Tabel denda --}}
             <div style="background: #F9F9F9; border-radius: 12px; border: 1px solid #D4A017; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
                 <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+{{-- ============================== --}}
+{{-- HEADER TABEL                   --}}
+{{-- ============================== --}}
+<thead>
+    <tr style="background-color: #2D3A1E; border-bottom: 2px solid #D4A017; text-align: left;">
+        <th style="padding: 14px 16px; color: #F5F0E8;">No</th>
+        <th style="padding: 14px 16px; color: #F5F0E8;">Judul Buku</th>
 
-                    {{-- Header tabel --}}
-                    <thead>
-                        <tr style="background-color: #2D3A1E; border-bottom: 2px solid #D4A017; text-align: left;">
-                            <th style="padding: 14px 16px; color: #F5F0E8;">No</th>
-                            <th style="padding: 14px 16px; color: #F5F0E8;">Judul Buku</th>
-                            <th style="padding: 14px 16px; color: #F5F0E8;">Hari Terlambat</th>
-                            <th style="padding: 14px 16px; color: #F5F0E8;">Denda/Hari</th>
-                            <th style="padding: 14px 16px; color: #F5F0E8;">Total Denda</th>
-                            <th style="padding: 14px 16px; color: #F5F0E8;">Status</th>
-                        </tr>
-                    </thead>
+        {{-- Kolom Jenis Denda (Rusak / Terlambat / Hilang) --}}
+        <th style="padding: 14px 16px; color: #F5F0E8;">Jenis</th>
 
-                    <tbody>
-                        @forelse($dendas as $index => $d)
-                        <tr style="border-bottom: 1px solid #E8E2D4; background-color: #FFFFFF; transition: background 0.15s;"
-                            onmouseover="this.style.backgroundColor='#F5F0E8'"
-                            onmouseout="this.style.backgroundColor='#FFFFFF'">
+        <th style="padding: 14px 16px; color: #F5F0E8;">Hari Terlambat</th>
+        <th style="padding: 14px 16px; color: #F5F0E8;">Denda/Hari</th>
+        <th style="padding: 14px 16px; color: #F5F0E8;">Total Denda</th>
+        <th style="padding: 14px 16px; color: #F5F0E8;">Status</th>
+    </tr>
+</thead>
 
-                            <td style="padding: 14px 16px; color: #8A7E6E;">{{ $index + 1 }}</td>
+{{-- ============================== --}}
+{{-- BODY TABEL                     --}}
+{{-- ============================== --}}
+<tbody>
+    @forelse($dendas as $index => $d)
+    <tr style="border-bottom: 1px solid #E8E2D4; background-color: #FFFFFF; transition: background 0.15s;"
+        onmouseover="this.style.backgroundColor='#F5F0E8'"
+        onmouseout="this.style.backgroundColor='#FFFFFF'">
 
-                            <td style="padding: 14px 16px; font-weight: 600; color: #2D3A1E;">{{ $d->judul_buku }}</td>
+        {{-- Nomor urut --}}
+        <td style="padding: 14px 16px; color: #8A7E6E;">{{ $index + 1 }}</td>
 
-                            {{-- Hari terlambat, badge merah --}}
-                            <td style="padding: 14px 16px;">
-                                <span style="background-color: #FEE2E2; color: #991b1b; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">
-                                    {{ $d->hari_terlambat }} hari
-                                </span>
-                            </td>
+        {{-- Judul buku --}}
+        <td style="padding: 14px 16px; font-weight: 600; color: #2D3A1E;">{{ $d->judul_buku }}</td>
 
-                            <td style="padding: 14px 16px; color: #8A7E6E;">Rp {{ number_format($d->denda_per_hari, 0, ',', '.') }}</td>
+        {{-- Jenis denda: badge warna berbeda tiap jenis --}}
+        <td style="padding: 14px 16px;">
+            @if($d->jenis_denda == 'rusak')
+                {{-- Badge kuning untuk buku rusak --}}
+                <span style="background-color: #FEF9C3; color: #854D0E; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">
+                    🔧 Rusak
+                </span>
+            @elseif($d->jenis_denda == 'hilang')
+                {{-- Badge merah gelap untuk buku hilang --}}
+                <span style="background-color: #FEE2E2; color: #7F1D1D; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">
+                    ❌ Hilang
+                </span>
+            @else
+                {{-- Badge biru/ungu untuk keterlambatan --}}
+                <span style="background-color: #EDE9FE; color: #5B21B6; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">
+                    🕐 Terlambat
+                </span>
+            @endif
+        </td>
 
-                            {{-- Total denda, merah tebal --}}
-                            <td style="padding: 14px 16px; font-weight: 700; color: #991b1b;">Rp {{ number_format($d->total_denda, 0, ',', '.') }}</td>
+        {{-- Hari terlambat, badge merah --}}
+        <td style="padding: 14px 16px;">
+            <span style="background-color: #FEE2E2; color: #991b1b; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">
+                {{ $d->hari_terlambat }} hari
+            </span>
+        </td>
 
-                            {{-- Badge status bayar --}}
-                            <td style="padding: 14px 16px;">
-                                @if($d->status_bayar == 'belum_bayar')
-                                    <span style="background-color: #FEE2E2; color: #991b1b; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Belum Bayar</span>
-                                @else
-                                    <span style="background-color: #DCFCE7; color: #166534; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Sudah Bayar</span>
-                                @endif
-                            </td>
+        {{-- Denda per hari --}}
+        <td style="padding: 14px 16px; color: #8A7E6E;">Rp {{ number_format($d->denda_per_hari, 0, ',', '.') }}</td>
 
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" style="padding: 40px; text-align: center; color: #8A7E6E;">
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                                    <span style="font-size: 40px;">✅</span>
-                                    <span style="font-style: italic;">Tidak ada denda 🎉</span>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
+        {{-- Total denda, merah tebal --}}
+        <td style="padding: 14px 16px; font-weight: 700; color: #991b1b;">Rp {{ number_format($d->total_denda, 0, ',', '.') }}</td>
+
+        {{-- Badge status bayar --}}
+        <td style="padding: 14px 16px;">
+            @if($d->status_bayar == 'belum_bayar')
+                {{-- Belum bayar: badge merah --}}
+                <span style="background-color: #FEE2E2; color: #991b1b; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Belum Bayar</span>
+            @else
+                {{-- Sudah bayar: badge hijau --}}
+                <span style="background-color: #DCFCE7; color: #166534; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Sudah Bayar</span>
+            @endif
+        </td>
+
+    </tr>
+    @empty
+    {{-- Jika tidak ada denda sama sekali --}}
+    <tr>
+        {{-- colspan diubah jadi 7 karena sudah ada kolom Jenis --}}
+        <td colspan="7" style="padding: 40px; text-align: center; color: #8A7E6E;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                <span style="font-size: 40px;">✅</span>
+                <span style="font-style: italic;">Tidak ada denda 🎉</span>
+            </div>
+        </td>
+    </tr>
+    @endforelse
+</tbody>
                 </table>
             </div>
 

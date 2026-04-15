@@ -223,14 +223,24 @@
                                     </form>
                                     @endif
 
-                                    {{-- Tombol verifikasi kembali, muncul saat status mengembalikan --}}
-                                    @if($item->status == 'mengembalikan')
-                                    <form action="{{ route('peminjaman.verifikasiKembali', $item->id) }}" method="POST" onsubmit="return confirm('Verifikasi pengembalian buku ini? Stok akan bertambah.')">
-                                        @csrf
-                                        <button type="submit" style="padding: 5px 10px; background: #DBEAFE; color: #1E3A5F; border: 1px solid #93C5FD; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">↩️ Verifikasi Kembali</button>
-                                    </form>
-                                    @endif
+                                   {{-- Tombol verifikasi kembali + rusak + hilang, muncul saat status mengembalikan --}}
+                                        @if($item->status == 'mengembalikan')
+                                        <form action="{{ route('peminjaman.verifikasiKembali', $item->id) }}" method="POST" onsubmit="return confirm('Verifikasi pengembalian buku ini? Stok akan bertambah.')">
+                                            @csrf
+                                            <button type="submit" style="padding: 5px 10px; background: #DBEAFE; color: #1E3A5F; border: 1px solid #93C5FD; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">↩️ Verifikasi Kembali</button>
+                                        </form>
 
+                                        <form action="{{ route('peminjaman.dendaRusak', $item->id) }}" method="POST" onsubmit="return confirm('Tandai buku ini RUSAK dan buat denda?')">
+                                            @csrf
+                                            <button type="submit" style="padding: 5px 10px; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">🔧 Rusak</button>
+                                        </form>
+
+                                        <form action="{{ route('peminjaman.dendaHilang', $item->id) }}" method="POST" onsubmit="return confirm('Tandai buku ini HILANG dan buat denda?')">
+                                            @csrf
+                                            <button type="submit" style="padding: 5px 10px; background: #FEE2E2; color: #991b1b; border: 1px solid #FCA5A5; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">❌ Hilang</button>
+                                        </form>
+                                        @endif
+                                        
                                     {{-- Tombol edit & hapus, hanya muncul kalau bukan menunggu/mengembalikan --}}
                                     @if($item->status != 'menunggu' && $item->status != 'mengembalikan')
                                     <a href="{{ route('peminjaman.edit', $item->id) }}" style="padding: 5px 10px; background: #FFFBEB; color: #2D3A1E; border: 1px solid #D4A017; border-radius: 6px; font-size: 11px; font-weight: 600; text-decoration: none;">✏️ Edit</a>

@@ -11,7 +11,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    // ✅ Tambah 'alamat' ke fillable agar bisa disimpan saat register
+    
     protected $fillable = [
         'name',
         'email',
@@ -21,7 +21,7 @@ class User extends Authenticatable
         'no_telepon',
         'username',
         'foto',
-        'alamat',    // ✅ Tambahan baru — data alamat anggota
+        'alamat',   
     ];
 
     // Kolom yang disembunyikan saat dijadikan array/JSON

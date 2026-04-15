@@ -91,6 +91,8 @@ Route::middleware(['auth', 'role:petugas'])->group(function () {
     Route::delete('/peminjaman/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
     Route::post('/peminjaman/{id}/verifikasi', [PeminjamanController::class, 'verifikasi'])->name('peminjaman.verifikasi');
     Route::post('/peminjaman/{id}/verifikasi-kembali', [PeminjamanController::class, 'verifikasiKembali'])->name('peminjaman.verifikasiKembali');
+    Route::post('/peminjaman/{id}/denda-rusak', [PeminjamanController::class, 'dendaRusak'])->name('peminjaman.dendaRusak');
+    Route::post('/peminjaman/{id}/denda-hilang', [PeminjamanController::class, 'dendaHilang'])->name('peminjaman.dendaHilang');
 
     // Kelola Anggota
     Route::get('/anggota', [AnggotaController::class, 'index'])->name('anggota.index');
@@ -103,6 +105,7 @@ Route::middleware(['auth', 'role:petugas'])->group(function () {
     Route::get('/denda/pengaturan', [DendaController::class, 'pengaturan'])->name('denda.pengaturan');
     Route::post('/denda/pengaturan', [DendaController::class, 'updatePengaturan'])->name('denda.updatePengaturan');
     Route::post('/denda/{id}/konfirmasi', [DendaController::class, 'konfirmasi'])->name('denda.konfirmasi');
+    Route::post('/denda/tambah-khusus', [DendaController::class, 'tambahDendaKhusus'])->name('denda.tambahKhusus');
 });
 
 // =============================================================

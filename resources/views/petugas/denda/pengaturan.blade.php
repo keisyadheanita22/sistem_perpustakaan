@@ -157,60 +157,72 @@
                     </div>
                 </div>
 
-                {{-- Form pengaturan denda: kirim ke denda.updatePengaturan via POST --}}
-                <form action="{{ route('denda.updatePengaturan') }}" method="POST" style="padding: 24px;">
-                    @csrf
+               <form action="{{ route('denda.updatePengaturan') }}" method="POST" style="padding: 24px;">
+    @csrf
 
-                    {{-- Input nominal denda per hari --}}
-                    <div style="margin-bottom: 8px;">
-                        <label style="display: block; font-size: 13px; font-weight: 600; color: #2D3A1E; margin-bottom: 8px;">
-                            Denda Per Hari (Rp)
-                        </label>
+    {{-- Input denda per hari --}}
+    <div style="margin-bottom: 20px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; color: #2D3A1E; margin-bottom: 8px;">
+            Denda keterlambatan (per hari)
+        </label>
+        <div style="display: flex; align-items: center; border: 1px solid #D4A017; border-radius: 8px; background: white; overflow: hidden;">
+            <span style="padding: 10px 14px; background: #F5F0E8; color: #8A7E6E; font-size: 13px; font-weight: 600; border-right: 1px solid #D4A017;">Rp</span>
+            <input type="number" name="denda_per_hari"
+                   value="{{ $dendaPerHari->nilai ?? 1000 }}" min="0"
+                   style="flex: 1; border: none; padding: 10px 14px; font-size: 13px; color: #2D3A1E; outline: none;">
+        </div>
+        @error('denda_per_hari')
+            <p style="color: #991b1b; font-size: 12px; margin: 6px 0 0 0;">⚠️ {{ $message }}</p>
+        @enderror
+    </div>
 
-                        {{-- Wrapper input dengan prefix "Rp" --}}
-                        <div style="display: flex; align-items: center; border: 1px solid #D4A017; border-radius: 8px; background: white; overflow: hidden;"
-                             id="input-wrapper">
-                            <span style="padding: 10px 14px; background: #F5F0E8; color: #8A7E6E; font-size: 13px; font-weight: 600; border-right: 1px solid #D4A017;">Rp</span>
-                            <input type="number"
-                                   name="nilai"
-                                   value="{{ $pengaturan->nilai ?? 2000 }}"
-                                   min="0"
-                                   style="flex: 1; border: none; padding: 10px 14px; font-size: 13px; color: #2D3A1E; outline: none; background: transparent;"
-                                   onfocus="document.getElementById('input-wrapper').style.borderColor='#1E3A5F'; document.getElementById('input-wrapper').style.boxShadow='0 0 0 3px rgba(30,58,95,0.1)'"
-                                   onblur="document.getElementById('input-wrapper').style.borderColor='#D4A017'; document.getElementById('input-wrapper').style.boxShadow='none'">
-                        </div>
+    {{-- Input denda buku rusak --}}
+    <div style="margin-bottom: 6px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; color: #2D3A1E; margin-bottom: 8px;">
+            Denda buku rusak
+        </label>
+        <div style="display: flex; align-items: center; border: 1px solid #D4A017; border-radius: 8px; background: white; overflow: hidden;">
+            <span style="padding: 10px 14px; background: #F5F0E8; color: #8A7E6E; font-size: 13px; font-weight: 600; border-right: 1px solid #D4A017;">Rp</span>
+            <input type="number" name="denda_buku_rusak"
+                   value="{{ $dendaRusak->nilai ?? 25000 }}" min="0"
+                   style="flex: 1; border: none; padding: 10px 14px; font-size: 13px; color: #2D3A1E; outline: none;">
+        </div>
+        <p style="font-size: 11px; color: #8A7E6E; margin: 5px 0 0 0;">Dikenakan saat petugas melaporkan buku rusak</p>
+        @error('denda_buku_rusak')
+            <p style="color: #991b1b; font-size: 12px; margin: 4px 0 0 0;">⚠️ {{ $message }}</p>
+        @enderror
+    </div>
 
-                        {{-- Pesan error validasi --}}
-                        @error('nilai')
-                            <p style="color: #991b1b; font-size: 12px; margin: 6px 0 0 0;">⚠️ {{ $message }}</p>
-                        @enderror
-                    </div>
+    {{-- Input denda buku hilang --}}
+    <div style="margin-bottom: 6px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; color: #2D3A1E; margin-bottom: 8px;">
+            Denda buku hilang
+        </label>
+        <div style="display: flex; align-items: center; border: 1px solid #D4A017; border-radius: 8px; background: white; overflow: hidden;">
+            <span style="padding: 10px 14px; background: #F5F0E8; color: #8A7E6E; font-size: 13px; font-weight: 600; border-right: 1px solid #D4A017;">Rp</span>
+            <input type="number" name="denda_buku_hilang"
+                   value="{{ $dendaHilang->nilai ?? 75000 }}" min="0"
+                   style="flex: 1; border: none; padding: 10px 14px; font-size: 13px; color: #2D3A1E; outline: none;">
+        </div>
+        <p style="font-size: 11px; color: #8A7E6E; margin: 5px 0 0 0;">Dikenakan saat petugas melaporkan buku hilang</p>
+        @error('denda_buku_hilang')
+            <p style="color: #991b1b; font-size: 12px; margin: 4px 0 0 0;">⚠️ {{ $message }}</p>
+        @enderror
+    </div>
 
-                    {{-- Divider tipis sebelum tombol --}}
-                    <div style="border-top: 1px solid #E8E2D4; margin: 20px 0;"></div>
+    <div style="border-top: 1px solid #E8E2D4; margin: 20px 0;"></div>
 
-                    {{-- Tombol aksi: Simpan dan Batal --}}
-                    <div style="display: flex; gap: 10px;">
-
-                        {{-- Tombol simpan, warna hijau gelap --}}
-                        <button type="submit"
-                                style="display: flex; align-items: center; gap: 6px; padding: 10px 20px; background-color: #2D3A1E; color: #F5F0E8; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            Simpan
-                        </button>
-
-                        {{-- Tombol batal, kembali ke daftar denda --}}
-                        <a href="{{ route('denda.index') }}"
-                           style="display: flex; align-items: center; gap: 6px; padding: 10px 20px; background: white; color: #8A7E6E; border: 1px solid #E8E2D4; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                            </svg>
-                            Batal
-                        </a>
-                    </div>
-                </form>
+    <div style="display: flex; gap: 10px;">
+        <button type="submit"
+                style="padding: 10px 20px; background-color: #2D3A1E; color: #F5F0E8; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+            Simpan
+        </button>
+        <a href="{{ route('denda.index') }}"
+           style="padding: 10px 20px; background: white; color: #8A7E6E; border: 1px solid #E8E2D4; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;">
+            Batal
+        </a>
+    </div>
+</form>
             </div>
 
         </main>

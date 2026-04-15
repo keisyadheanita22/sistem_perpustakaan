@@ -13,6 +13,7 @@ class Denda extends Model
         'peminjaman_id',
         'nama_anggota',
         'judul_buku',
+        'jenis_denda', 
         'hari_terlambat',
         'denda_per_hari',
         'total_denda',

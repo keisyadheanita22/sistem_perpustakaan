@@ -227,7 +227,17 @@
 
         </tbody>
     </table>
-
+<!-- =========================
+     TOTAL KESELURUHAN DENDA
+========================= -->
+<div style="background:#2D3A1E;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-size:11px;font-weight:700;color:#D4A017;text-transform:uppercase;">
+        Total Keseluruhan Denda
+    </span>
+    <span style="font-size:12px;font-weight:700;color:#FFFFFF;">
+        Rp {{ number_format($dendas->sum('total_denda'), 0, ',', '.') }}
+    </span>
+</div>
 </div>
 <!-- =========================
      FOOTER

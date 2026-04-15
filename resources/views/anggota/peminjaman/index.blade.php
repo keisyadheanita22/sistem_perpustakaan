@@ -149,6 +149,8 @@
                                     <span style="background-color: #FEE2E2; color: #991b1b; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Dipinjam</span>
                                 @elseif($p->status == 'mengembalikan')
                                     <span style="background-color: #EDE9FE; color: #5b21b6; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Menunggu Verifikasi</span>
+                               @elseif($p->status == 'ada_denda')
+                                    <span style="background-color: #FEE2E2; color: #991b1b; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Ada Denda</span>
                                 @else
                                     <span style="background-color: #DCFCE7; color: #166534; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Dikembalikan</span>
                                 @endif
@@ -165,6 +167,7 @@
                                             Batalkan
                                         </button>
                                     </form>
+
                                 @elseif($p->status == 'dipinjam')
                                     <form method="POST" action="{{ route('peminjaman.kembalikan', $p->id) }}">
                                         @csrf
@@ -174,11 +177,14 @@
                                             Kembalikan
                                         </button>
                                     </form>
-                                @elseif($p->status == 'mengembalikan')
-                                    <span style="color: #5b21b6; font-size: 11px; font-style: italic;">Menunggu verifikasi...</span>
-                                @else
-                                    <span style="color: #8A7E6E; font-size: 11px;">Selesai ✓</span>
-                                @endif
+                                                                    @elseif($p->status == 'mengembalikan')
+                                        <span style="color: #5b21b6; font-size: 11px; font-style: italic;">Menunggu verifikasi...</span>
+                                    @elseif($p->status == 'ada_denda')
+                                        <a href="{{ route('denda.saya') }}"
+                                        style="color: #991b1b; font-size: 11px; font-weight: 600;">⚠️ Bayar Denda</a>
+                                    @else
+                                        <span style="color: #8A7E6E; font-size: 11px;">Selesai ✓</span>
+                                    @endif
                             </td>
                         </tr>
                         @empty

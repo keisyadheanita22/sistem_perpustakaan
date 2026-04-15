@@ -91,6 +91,24 @@
         </tr>
         @endforeach
 
+        {{-- ========================
+             TOTAL KESELURUHAN DENDA
+        ======================== --}}
+        <tr>
+            {{-- Kolom No, Nama, Jenis kosong --}}
+            <td colspan="3" style="border: 1px solid #000; background-color: #f3f4f6; font-weight: bold; text-align: right;">
+                Total Keseluruhan Denda
+            </td>
+
+            {{-- Jumlah total semua denda --}}
+            <td style="border: 1px solid #000; background-color: #f3f4f6; font-weight: bold;">
+                Rp {{ number_format($dendas->sum('total_denda'), 0, ',', '.') }}
+            </td>
+
+            {{-- Kolom status bayar kosong --}}
+            <td style="border: 1px solid #000; background-color: #f3f4f6;"></td>
+        </tr>
+
         {{-- Tampil jika tidak ada data denda --}}
         @if($dendas->isEmpty())
         <tr>

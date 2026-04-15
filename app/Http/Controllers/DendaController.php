@@ -52,7 +52,7 @@ class DendaController extends Controller
         $denda->update(['status_bayar' => 'sudah_bayar']);
 
         if ($denda->peminjaman) {
-            $denda->peminjaman->update(['status' => 'dikembalikan']);
+           $denda->peminjaman->update(['status' => 'selesai']);
             if ($denda->peminjaman->buku) {
                 $denda->peminjaman->buku->increment('stok');
             }

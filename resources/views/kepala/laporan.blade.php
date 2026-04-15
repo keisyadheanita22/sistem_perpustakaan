@@ -88,26 +88,31 @@
         </div>
 
         {{-- FILTER BULAN & TAHUN + TOMBOL EKSPOR --}}
-        <div style="background: #FFFDF8; border-radius: 14px; border: 1px solid #E8E2D4; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(45,58,30,0.05);">
-            <form method="GET" action="{{ route('kepala.laporan') }}" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                {{-- Dropdown pilih bulan --}}
-                <select name="bulan" style="border: 1px solid #DDD6C8; border-radius: 8px; padding: 7px 10px; font-size: 13px; color: #2D3A1E; background: #F5F0E8;">
-                    <option value="">Semua Bulan</option>
-                    @foreach(['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $i => $bln)
-                        <option value="{{ $i+1 }}" {{ request('bulan') == $i+1 ? 'selected' : '' }}>{{ $bln }}</option>
-                    @endforeach
-                </select>
-                {{-- Dropdown pilih tahun (4 tahun terakhir) --}}
-                <select name="tahun" style="border: 1px solid #DDD6C8; border-radius: 8px; padding: 7px 10px; font-size: 13px; color: #2D3A1E; background: #F5F0E8;">
-                    @for($y = now()->year; $y >= now()->year - 3; $y--)
-                        <option value="{{ $y }}" {{ request('tahun', now()->year) == $y ? 'selected' : '' }}>{{ $y }}</option>
-                    @endfor
-                </select>
-                <button type="submit" style="padding: 7px 18px; border-radius: 8px; background: #2D3A1E; color: #D4A017; font-size: 13px; font-weight: 700; border: none; cursor: pointer;">
-                    Filter
-                </button>
-            </form>
+<div style="background: #FFFDF8; border-radius: 14px; border: 1px solid #E8E2D4; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(45,58,30,0.05);">
+    <form method="GET" action="{{ route('kepala.laporan') }}" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
 
+        {{-- Dropdown pilih bulan --}}
+<select name="bulan" style="border: 1px solid #DDD6C8; border-radius: 8px; padding: 7px 10px; font-size: 13px; color: #2D3A1E; background: #F5F0E8; -webkit-appearance: auto; cursor: pointer;">
+    <option value="">Semua Bulan</option>
+    @foreach(['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $i => $bln)
+        <option value="{{ $i+1 }}" {{ request('bulan') == $i+1 ? 'selected' : '' }}>{{ $bln }}</option>
+    @endforeach
+</select>
+
+{{-- Dropdown pilih tahun --}}
+<select name="tahun" style="border: 1px solid #DDD6C8; border-radius: 8px; padding: 7px 10px; font-size: 13px; color: #2D3A1E; background: #F5F0E8; -webkit-appearance: auto; cursor: pointer;">
+    <option value="">Semua Tahun</option>
+    @for($y = now()->year; $y >= now()->year - 3; $y--)
+        <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>{{ $y }}</option>
+    @endfor
+</select>
+
+        {{-- Tombol submit filter --}}
+        <button type="submit" style="padding: 7px 18px; border-radius: 8px; background: #2D3A1E; color: #D4A017; font-size: 13px; font-weight: 700; border: none; cursor: pointer;">
+            Filter
+        </button>
+
+    </form>
             {{-- TOMBOL EKSPOR PDF, EXCEL & PRINT --}}
             <div style="display: flex; align-items: center; gap: 8px;">
                 {{-- Export ke PDF dengan filter bulan/tahun aktif --}}
@@ -310,35 +315,53 @@
                 </tr>
                 @endforelse
 
+                {{-- ========================
+     TOTAL KESELURUHAN DENDA
+======================== --}}
+<tr style="background: #2D3A1E; border-top: 2px solid #D4A017;">
+
+    {{-- Kolom No, Anggota, Jenis dikosongkan --}}
+    <td colspan="3" style="padding: 11px 16px; color: #D4A017; font-weight: 700; font-size: 12px; text-align: right; text-transform: uppercase; letter-spacing: .06em;">
+        Total Keseluruhan Denda
+    </td>
+
+    {{-- Jumlah total semua denda --}}
+    <td style="padding: 11px 16px; font-weight: 700; color: #FFFFFF; font-size: 13px;">
+        Rp {{ number_format($dendas->sum('total_denda'), 0, ',', '.') }}
+    </td>
+
+    {{-- Kolom status bayar dikosongkan --}}
+    <td style="padding: 11px 16px;"></td>
+            </tr>
             </tbody>
 
         </table>
 
     </div>
 </div>
-{{-- AKHIR TABEL DENDA --}}
+        {{-- AKHIR TABEL DENDA --}}
 
-{{-- JAVASCRIPT: Toggle dropdown profil & tutup saat klik di luar --}}
-<script>
-    function toggleDropdown() {
-        const menu = document.getElementById('dropdownMenu');
-        const chevron = document.getElementById('chevronIcon');
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'block';
-            chevron.style.transform = 'rotate(180deg)';
-        } else {
-            menu.style.display = 'none';
-            chevron.style.transform = 'rotate(0deg)';
-        }
-    }
-    window.onclick = function(e) {
-        const wrapper = document.getElementById('profileWrapper');
-        if (!wrapper.contains(e.target)) {
-            document.getElementById('dropdownMenu').style.display = 'none';
-            document.getElementById('chevronIcon').style.transform = 'rotate(0deg)';
-        }
-    }
-</script>
+        {{-- JAVASCRIPT: Toggle dropdown profil & tutup saat klik di luar --}}
+        <script>
+            function toggleDropdown() {
+                const menu = document.getElementById('dropdownMenu');
+                const chevron = document.getElementById('chevronIcon');
+                if (menu.style.display === 'none' || menu.style.display === '') {
+                    menu.style.display = 'block';
+                    chevron.style.transform = 'rotate(180deg)';
+                } else {
+                    menu.style.display = 'none';
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+            }
+            window.onclick = function(e) {
+                const wrapper = document.getElementById('profileWrapper');
+                if (!wrapper.contains(e.target)) {
+                    document.getElementById('dropdownMenu').style.display = 'none';
+                    document.getElementById('chevronIcon').style.transform = 'rotate(0deg)';
+                }
+            }
+        </script>
 
 </body>
 </html>

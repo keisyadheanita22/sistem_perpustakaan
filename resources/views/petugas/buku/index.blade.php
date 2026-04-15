@@ -111,12 +111,71 @@
 
         {{-- KONTEN UTAMA --}}
         <main style="flex: 1; padding: 32px; min-width: 0;">
+    
+           {{-- ================= HEADER HALAMAN ================= --}}
+<div style="margin-bottom: 16px;">
+    {{-- Judul halaman --}}
+    <h1 style="font-size: 24px; font-weight: 700; color: #2D3A1E;">
+        Data Buku
+    </h1>
+</div>
 
-            {{-- Header halaman + tombol tambah buku --}}
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h1 style="font-size: 24px; font-weight: 700; color: #2D3A1E;">Data Buku</h1>
-                <a href="{{ route('buku.create') }}" style="background-color: #2D3A1E; color: #D4A017; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; border: 1px solid #D4A017;">+ Tambah Buku</a>
-            </div>
+{{-- ================= BAR ATAS (TOMBOL + FILTER) ================= --}}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+    
+    {{-- ✅ Tombol tambah buku (SEKARANG DI KIRI) --}}
+    <a href="{{ route('buku.create') }}"
+       style="background-color: #2D3A1E; color: #D4A017; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; border: 1px solid #D4A017;">
+       + Tambah Buku
+    </a>
+
+    {{-- ✅ Filter + search (SEKARANG DI KANAN) --}}
+    <form method="GET" action="{{ route('buku.index') }}" 
+          style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+
+       {{-- ================= DROPDOWN KATEGORI ================= --}}
+<div style="position: relative;">
+
+    {{-- SELECT --}}
+    <select name="kategori_id" onchange="this.form.submit()"
+            style="appearance: none; 
+                   -webkit-appearance: none;
+                   -moz-appearance: none;
+                   border: 1px solid #D4A017; 
+                   border-radius: 8px; 
+                   padding: 8px 36px 8px 12px; 
+                   font-size: 13px; 
+                   background: white; 
+                   color: #2D3A1E;
+                   cursor: pointer;">
+        
+        {{-- Default option --}}
+        <option value="">📂 Semua Kategori</option>
+
+        {{-- Loop kategori --}}
+        @foreach ($kategoris as $kategori)
+            <option value="{{ $kategori->id }}" {{ request('kategori_id') == $kategori->id ? 'selected' : '' }}>
+                {{ $kategori->nama_kategori }}
+            </option>
+        @endforeach
+    </select>
+
+    {{-- ICON PANAH DROPDOWN --}}
+    <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 12px; color: #8A7E6E;">
+        ▼
+    </span>
+
+</div>
+
+        {{-- Input search --}}
+        <div style="display: flex; align-items: center; border: 1px solid #D4A017; border-radius: 8px; padding: 8px 12px; gap: 8px; background: white;">
+            🔍
+            <input type="text" name="search" value="{{ request('search') }}"
+                   placeholder="Cari Buku..."
+                   style="outline: none; font-size: 13px; width: 160px; border: none; color: #2D3A1E;">
+        </div>
+    </form>
+</div>
 
             {{-- Notifikasi sukses --}}
             @if(session('success'))
@@ -126,30 +185,7 @@
                 </div>
             @endif
 
-            {{-- Filter kategori + kolom pencarian --}}
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 20px; gap: 10px;">
-                <form method="GET" action="{{ route('buku.index') }}" style="display: flex; align-items: center; gap: 10px;">
-
-                    {{-- Dropdown filter berdasarkan kategori --}}
-                    <select name="kategori_id" onchange="this.form.submit()" style="border: 1px solid #D4A017; border-radius: 8px; padding: 8px 12px; font-size: 13px; outline: none; background: white; color: #2D3A1E;">
-                        <option value="">Semua Kategori </option>
-                        @foreach ($kategoris as $kategori)
-                            <option value="{{ $kategori->id }}" {{ request('kategori_id') == $kategori->id ? 'selected' : '' }}>
-                                {{ $kategori->nama_kategori }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    {{-- Input pencarian buku berdasarkan judul/pengarang --}}
-                    <div style="display: flex; align-items: center; border: 1px solid #D4A017; border-radius: 8px; padding: 8px 12px; gap: 8px; background: white;">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px; color: #8A7E6E;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-                        </svg>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="🔍 Cari Buku..." style="outline: none; font-size: 13px; width: 180px; border: none; color: #2D3A1E;">
-                    </div>
-                </form>
-            </div>
-
+          
             {{-- Tampilan kalau tidak ada data buku --}}
             @if($bukus->isEmpty())
                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 64px; color: #8A7E6E;">

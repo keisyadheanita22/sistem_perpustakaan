@@ -117,7 +117,7 @@
             <div style="display: flex; align-items: center; gap: 8px;">
                 {{-- Export ke PDF dengan filter bulan/tahun aktif --}}
                 <a href="{{ route('kepala.laporan.pdf', request()->query()) }}"
-                   style="padding: 7px 14px; border-radius: 8px; background: #8B3A3A; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none;">📄 PDF</a>
+                   style="padding: 7px 14px; border-radius: 8px; background: #B8860B; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none;">📄 PDF</a>
                 {{-- Export ke Excel dengan filter bulan/tahun aktif --}}
                 <a href="{{ route('kepala.laporan.excel', request()->query()) }}"
                    style="padding: 7px 14px; border-radius: 8px; background: #2D3A1E; color: #D4A017; font-size: 13px; font-weight: 600; text-decoration: none;">📊 Excel</a>

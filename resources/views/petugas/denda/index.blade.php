@@ -6,7 +6,6 @@
     <title>Denda</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
-
         function toggleDropdown() {
             const menu = document.getElementById('dropdownMenu');
             const chevron = document.getElementById('chevronIcon');
@@ -29,15 +28,6 @@
             }
         }
     </script>
-    
-    <style>
-        @media print {
-            body > *:not(#print-overlay) { display: none !important; }
-            #print-overlay { display: block !important; position: static !important; background: none !important; }
-            #print-overlay > div { box-shadow: none !important; width: 100% !important; }
-            .no-print { display: none !important; }
-        }
-    </style>
 </head>
 <body style="margin: 0; font-family: ui-sans-serif, system-ui; background-color: #F5F0E8;">
 
@@ -141,7 +131,7 @@
                 </a>
             </div>
 
-            {{-- Card total keseluruhan denda (di luar tabel!) --}}
+            {{-- Card total keseluruhan denda --}}
             <div style="background: #FFFDF8; border: 1px solid #E8E2D4; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
                 <div>
                     <p style="font-size: 12px; color: #8A7E6E; margin: 0; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;">Total Keseluruhan Denda</p>
@@ -290,7 +280,7 @@
                 </div>
             </div>
 
-            <div class="no-print" style="display: flex; gap: 10px; padding: 0 24px 24px; justify-content: flex-end;">
+            <div style="display: flex; gap: 10px; padding: 0 24px 24px; justify-content: flex-end;">
                 <button onclick="closePrintModal()" style="padding: 9px 20px; border: 1px solid #E8E2D4; border-radius: 8px; background: white; cursor: pointer; font-size: 13px; color: #8A7E6E; font-weight: 600;">Tutup</button>
                 <button onclick="doPrint()" style="padding: 9px 20px; background: #2D3A1E; color: #F5F0E8; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;">🖨️ Print</button>
             </div>
@@ -308,9 +298,9 @@
                 const total   = this.dataset.total;
                 const status  = this.dataset.status;
 
-                const jenisLabel  = jenis === 'rusak' ? '🔧 Rusak'
-                                  : jenis === 'hilang' ? '❌ Hilang'
-                                  : '⏰ Terlambat';
+                const jenisLabel  = jenis === 'rusak' ? 'Rusak'
+                                  : jenis === 'hilang' ? 'Hilang'
+                                  : 'Terlambat';
                 const statusLabel = status === 'belum_bayar' ? 'Belum Bayar' : 'Sudah Bayar';
                 const tanggal     = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
 
@@ -332,12 +322,205 @@
         }
 
         function doPrint() {
-            const printContents = document.getElementById('print-area').innerHTML;
-            const original = document.body.innerHTML;
-            document.body.innerHTML = `<div style="padding:50px; font-family:ui-sans-serif,system-ui;">${printContents}</div>`;
+            const nama     = document.getElementById('p-nama').textContent;
+            const judul    = document.getElementById('p-judul').textContent;
+            const jenis    = document.getElementById('p-jenis').textContent;
+            const hari     = document.getElementById('p-hari').textContent;
+            const perHari  = document.getElementById('p-per-hari').textContent;
+            const total    = document.getElementById('p-total').textContent;
+            const status   = document.getElementById('p-status').textContent;
+            const tanggal  = document.getElementById('p-tanggal').textContent;
+
+            const printWin = window.open('', '_blank', 'width=700,height=900');
+            printWin.document.write(`<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Bukti Denda - ${nama}</title>
+    <style>
+        @page {
+            size: A5;
+            margin: 20mm 18mm;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 13px;
+            color: #1a1a1a;
+            background: #fff;
+        }
+        .wrapper {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 32px 28px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 3px solid #2D3A1E;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2D3A1E;
+            margin-bottom: 4px;
+            letter-spacing: 0.04em;
+        }
+        .header p {
+            font-size: 12px;
+            color: #666;
+        }
+        .gold-line {
+            height: 3px;
+            background: #D4A017;
+            margin-bottom: 24px;
+            border-radius: 2px;
+        }
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+        .detail-table td {
+            padding: 8px 4px;
+            vertical-align: top;
+            border-bottom: 1px dashed #e5e5e5;
+        }
+        .detail-table td:first-child {
+            color: #666;
+            width: 42%;
+            font-size: 12px;
+        }
+        .detail-table td:last-child {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .detail-table tr:last-child td {
+            border-bottom: none;
+        }
+        .total-row td {
+            padding-top: 14px !important;
+            border-top: 2px solid #2D3A1E;
+            border-bottom: none !important;
+        }
+        .total-row td:last-child {
+            color: #991b1b !important;
+            font-size: 16px !important;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .status-belum {
+            background: #FEE2E2;
+            color: #991b1b;
+            border: 1px solid #FECACA;
+        }
+        .status-lunas {
+            background: #DCFCE7;
+            color: #166534;
+            border: 1px solid #BBF7D0;
+        }
+        .footer {
+            margin-top: 28px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e5e5;
+            text-align: center;
+        }
+        .footer p {
+            font-size: 11px;
+            color: #999;
+            line-height: 1.6;
+        }
+        .ttd-area {
+            margin-top: 32px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .ttd-box {
+            text-align: center;
+            width: 140px;
+        }
+        .ttd-box .label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 48px;
+        }
+        .ttd-box .line {
+            border-top: 1px solid #333;
+            padding-top: 4px;
+            font-size: 11px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <h1>BUKTI DENDA PERPUSTAKAAN</h1>
+            <p>Sistem Perpustakaan</p>
+        </div>
+        <div class="gold-line"></div>
+
+        <table class="detail-table">
+            <tr>
+                <td>Nama Anggota</td>
+                <td>: ${nama}</td>
+            </tr>
+            <tr>
+                <td>Judul Buku</td>
+                <td>: ${judul}</td>
+            </tr>
+            <tr>
+                <td>Jenis Denda</td>
+                <td>: ${jenis}</td>
+            </tr>
+            <tr>
+                <td>Hari Terlambat</td>
+                <td>: ${hari} hari</td>
+            </tr>
+            <tr>
+                <td>Denda / Hari</td>
+                <td>: ${perHari}</td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td>: <span class="status-badge ${status === 'Belum Bayar' ? 'status-belum' : 'status-lunas'}">${status}</span></td>
+            </tr>
+            <tr>
+                <td>Tanggal Cetak</td>
+                <td>: ${tanggal}</td>
+            </tr>
+            <tr class="total-row">
+                <td>TOTAL DENDA</td>
+                <td>: ${total}</td>
+            </tr>
+        </table>
+
+        <div class="ttd-area">
+            <div class="ttd-box">
+                <div class="label">Petugas Perpustakaan</div>
+                <div class="line">( __________________ )</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Dokumen ini merupakan bukti resmi pembayaran denda.<br>Terima kasih telah menggunakan layanan perpustakaan kami.</p>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
             window.print();
-            document.body.innerHTML = original;
-            location.reload();
+        };
+    <\/script>
+</body>
+</html>`);
+            printWin.document.close();
         }
 
         document.getElementById('print-modal').addEventListener('click', function(e) {

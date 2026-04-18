@@ -38,7 +38,7 @@ class BukuController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'judul'       => 'required|unique:bukus,judul', // ✅ nama tabel yang benar adalah 'bukus'
+            'judul'       => 'required|unique:bukus,judul', 
             'pengarang'   => 'required',
             'penerbit'    => 'required',
             'kategori_id' => 'required',

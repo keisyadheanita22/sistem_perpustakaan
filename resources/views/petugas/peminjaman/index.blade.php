@@ -83,16 +83,10 @@
         <aside style="width: 176px; background-color: #2D3A1E; padding: 20px 12px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
             <span style="font-size: 10px; color: #7A9E5A; text-transform: uppercase; letter-spacing: 0.08em; padding: 0 8px; margin: 0 0 4px 0;">Menu Petugas</span>
 
-            {{-- Link dashboard --}}
             <a href="{{ route('petugas.dashboard') }}" style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; color: #C8DDB0; font-size: 13px; text-decoration: none;">Dashboard</a>
-
-            {{-- Link data buku --}}
             <a href="{{ route('buku.index') }}" style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; color: #C8DDB0; font-size: 13px; text-decoration: none;">Data Buku</a>
-
-            {{-- Link data anggota --}}
             <a href="{{ route('anggota.index') }}" style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; color: #C8DDB0; font-size: 13px; text-decoration: none;">Data Anggota</a>
 
-            {{-- Link peminjaman - aktif + badge notifikasi --}}
             <a href="{{ route('peminjaman.index') }}" style="display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: 8px; background: #D4A017; color: #2D3A1E; font-size: 13px; text-decoration: none; font-weight: 600;">
                 <span>Peminjaman</span>
                 @if(!empty($perluVerifikasi) && $perluVerifikasi > 0)
@@ -102,17 +96,13 @@
                 @endif
             </a>
 
-            {{-- Link kategori --}}
             <a href="{{ route('kategori.index') }}" style="display: flex; align-items: center; padding: 9px 12px; border-radius: 8px; color: #C8DDB0; font-size: 13px; text-decoration: none;">Kategori</a>
-
-            {{-- Link denda --}}
             <a href="{{ route('denda.index') }}" style="display: flex; align-items: center; padding: 9px 12px; border-radius: 8px; color: #C8DDB0; font-size: 13px; text-decoration: none;">Denda</a>
         </aside>
 
         {{-- KONTEN UTAMA --}}
         <main style="flex: 1; padding: 32px;">
 
-            {{-- Judul halaman --}}
             <div style="margin-bottom: 24px;">
                 <h1 style="font-size: 24px; font-weight: 700; color: #2D3A1E; margin: 0;">Peminjaman</h1>
             </div>
@@ -133,7 +123,7 @@
                 </div>
             @endif
 
-            {{-- Kolom pencarian anggota --}}
+            {{-- Kolom pencarian --}}
             <div style="display: flex; justify-content: flex-start; margin-bottom: 20px;">
                 <form method="GET" action="{{ route('peminjaman.index') }}">
                     <div style="display: flex; align-items: center; border: 1px solid #D4A017; border-radius: 8px; padding: 8px 12px; gap: 8px; background: white;">
@@ -148,8 +138,6 @@
             {{-- Tabel peminjaman --}}
             <div style="background: #F9F9F9; border-radius: 12px; border: 1px solid #D4A017; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
                 <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-
-                    {{-- Header tabel warna hijau gelap --}}
                     <thead>
                         <tr style="background-color: #2D3A1E; border-bottom: 2px solid #D4A017; text-align: left;">
                             <th style="padding: 14px 16px; color: #F5F0E8;">No</th>
@@ -165,31 +153,20 @@
                     </thead>
 
                     <tbody>
-                        {{-- Looping data peminjaman --}}
                         @forelse ($peminjamans as $item)
                         <tr style="border-bottom: 1px solid #E8E2D4; background-color: #FFFFFF; transition: background 0.15s;"
                             onmouseover="this.style.backgroundColor='#F5F0E8'"
                             onmouseout="this.style.backgroundColor='#FFFFFF'">
 
-                            {{-- Nomor urut --}}
-                            <td style="padding: 14px 16px; color: #8A7E6E;">{{ $loop->iteration }}</td>
+                            {{-- Nomor urut terbalik: data terbaru = nomor 1 --}}
+                            <td style="padding: 14px 16px; color: #8A7E6E;">{{ $peminjamans->count() - $loop->index }}</td>
 
-                            {{-- ID peminjaman --}}
                             <td style="padding: 14px 16px; font-weight: 600; color: #2D3A1E;">{{ $item->id_peminjaman }}</td>
-
-                            {{-- Nama anggota --}}
                             <td style="padding: 14px 16px; color: #2D3A1E;">{{ $item->nama_anggota }}</td>
-
-                            {{-- Judul buku --}}
                             <td style="padding: 14px 16px; color: #2D3A1E;">{{ $item->buku->judul ?? '-' }}</td>
-
-                            {{-- Tanggal pinjam --}}
                             <td style="padding: 14px 16px; color: #8A7E6E;">{{ $item->tanggal_pinjam }}</td>
-
-                            {{-- Batas kembali --}}
                             <td style="padding: 14px 16px; color: #8A7E6E;">{{ $item->tanggal_kembali }}</td>
 
-                            {{-- Tanggal kembali aktual, hanya tampil kalau sudah dikembalikan --}}
                             <td style="padding: 14px 16px; color: #8A7E6E;">
                                 @if($item->status == 'dikembalikan')
                                     {{ \Carbon\Carbon::parse($item->updated_at)->format('Y-m-d') }}
@@ -198,7 +175,6 @@
                                 @endif
                             </td>
 
-                            {{-- Badge status peminjaman --}}
                             <td style="padding: 14px 16px;">
                                 @if($item->status == 'menunggu')
                                     <span style="background-color: #FEF3C7; color: #92400E; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Menunggu</span>
@@ -206,16 +182,17 @@
                                     <span style="background-color: #DBEAFE; color: #1E3A5F; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Dipinjam</span>
                                 @elseif($item->status == 'mengembalikan')
                                     <span style="background-color: #EDE9FE; color: #5B21B6; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Minta Kembali</span>
+                                @elseif($item->status == 'ada_denda')
+                                    <span style="background-color: #FEE2E2; color: #991b1b; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Ada Denda</span>
                                 @else
                                     <span style="background-color: #DCFCE7; color: #166534; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Dikembalikan</span>
                                 @endif
                             </td>
 
-                            {{-- Tombol aksi --}}
                             <td style="padding: 14px 16px;">
                                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;">
 
-                                    {{-- Tombol verifikasi pinjam, muncul saat status menunggu --}}
+                                    {{-- Tombol verifikasi pinjam --}}
                                     @if($item->status == 'menunggu')
                                     <form action="{{ route('peminjaman.verifikasi', $item->id) }}" method="POST" onsubmit="return confirm('Verifikasi peminjaman ini?')">
                                         @csrf
@@ -223,25 +200,25 @@
                                     </form>
                                     @endif
 
-                                   {{-- Tombol verifikasi kembali + rusak + hilang, muncul saat status mengembalikan --}}
-                                        @if($item->status == 'mengembalikan')
-                                        <form action="{{ route('peminjaman.verifikasiKembali', $item->id) }}" method="POST" onsubmit="return confirm('Verifikasi pengembalian buku ini? Stok akan bertambah.')">
-                                            @csrf
-                                            <button type="submit" style="padding: 5px 10px; background: #DBEAFE; color: #1E3A5F; border: 1px solid #93C5FD; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">↩️ Verifikasi Kembali</button>
-                                        </form>
+                                    {{-- Tombol verifikasi kembali + rusak + hilang --}}
+                                    @if($item->status == 'mengembalikan')
+                                    <form action="{{ route('peminjaman.verifikasiKembali', $item->id) }}" method="POST" onsubmit="return confirm('Verifikasi pengembalian buku ini? Stok akan bertambah.')">
+                                        @csrf
+                                        <button type="submit" style="padding: 5px 10px; background: #DBEAFE; color: #1E3A5F; border: 1px solid #93C5FD; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">↩️ Verifikasi Kembali</button>
+                                    </form>
 
-                                        <form action="{{ route('peminjaman.dendaRusak', $item->id) }}" method="POST" onsubmit="return confirm('Tandai buku ini RUSAK dan buat denda?')">
-                                            @csrf
-                                            <button type="submit" style="padding: 5px 10px; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">🔧 Rusak</button>
-                                        </form>
+                                    <form action="{{ route('peminjaman.dendaRusak', $item->id) }}" method="POST" onsubmit="return confirm('Tandai buku ini RUSAK dan buat denda?')">
+                                        @csrf
+                                        <button type="submit" style="padding: 5px 10px; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">🔧 Rusak</button>
+                                    </form>
 
-                                        <form action="{{ route('peminjaman.dendaHilang', $item->id) }}" method="POST" onsubmit="return confirm('Tandai buku ini HILANG dan buat denda?')">
-                                            @csrf
-                                            <button type="submit" style="padding: 5px 10px; background: #FEE2E2; color: #991b1b; border: 1px solid #FCA5A5; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">❌ Hilang</button>
-                                        </form>
-                                        @endif
-                                        
-                                    {{-- Tombol edit & hapus, hanya muncul kalau bukan menunggu/mengembalikan --}}
+                                    <form action="{{ route('peminjaman.dendaHilang', $item->id) }}" method="POST" onsubmit="return confirm('Tandai buku ini HILANG dan buat denda?')">
+                                        @csrf
+                                        <button type="submit" style="padding: 5px 10px; background: #FEE2E2; color: #991b1b; border: 1px solid #FCA5A5; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">❌ Hilang</button>
+                                    </form>
+                                    @endif
+
+                                    {{-- Tombol edit & hapus --}}
                                     @if($item->status != 'menunggu' && $item->status != 'mengembalikan')
                                     <a href="{{ route('peminjaman.edit', $item->id) }}" style="padding: 5px 10px; background: #FFFBEB; color: #2D3A1E; border: 1px solid #D4A017; border-radius: 6px; font-size: 11px; font-weight: 600; text-decoration: none;">✏️ Edit</a>
                                     <form action="{{ route('peminjaman.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin hapus peminjaman ini?')">
@@ -255,7 +232,6 @@
                             </td>
                         </tr>
 
-                        {{-- Tampilan kalau tidak ada data --}}
                         @empty
                         <tr>
                             <td colspan="9" style="padding: 40px; text-align: center; color: #8A7E6E;">
